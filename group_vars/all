@@ -1,0 +1,8 @@
+#
+# Variables that apply to all our hosts.
+#
+
+---
+ansible_connection:              ssh
+ansible_ssh_user:                ubuntu
+

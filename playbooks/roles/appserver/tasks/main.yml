@@ -1,0 +1,13 @@
+#
+#
+# Download, install, configure, test and run our Django app.
+#
+#
+
+---
+
+- include: create_myapp_user.yml
+- include: install_myapp_system_packages.yml
+- include: setup_myapp_virtualenv.yml
+- include: setup_myapp_django.yml
+

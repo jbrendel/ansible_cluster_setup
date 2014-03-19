@@ -1,0 +1,64 @@
+#
+# Setup Postgres.
+#
+# This creates a DB user, a database and assigns rights and privileges.
+#
+
+---
+
+- name: install postgres packages
+  apt: pkg={{ item }} state=present
+  with_items:
+      - postgresql
+      - postgresql-client
+      - python-psycopg2
+      - libpq-dev
+
+- name: ensure the server is started
+  service: name=postgresql state=started
+
+- name: configure postgres user
+  sudo_user: postgres
+  postgresql_user: >
+      name={{ myapp_db_user_name}}
+      password={{ myapp_db_user_password }}
+      role_attr_flags=CREATEDB
+
+- name: create database
+  sudo_user: postgres
+  postgresql_db: >
+      name={{ myapp_db_name }}
+      encoding='UTF8'
+      owner={{ myapp_db_user_name }}
+
+- name: adjust DB privileges
+  sudo_user: postgres
+  postgresql_privs: >
+      database={{ myapp_db_name }}
+      state=present
+      privs=ALL
+      type=database
+      roles={{ myapp_db_user_name }}
+
+- name: adding access permissions for app server hosts
+  lineinfile: >
+      dest=/etc/postgresql/9.1/main/pg_hba.conf
+      line="host all all {{ hostvars[item]['ansible_eth0']['ipv4']['address'] }}/24 md5"
+  with_items: groups['applayer-hosts']
+  notify:
+      - restart db server
+
+- name: removing test database if it is still there for some reason
+  sudo_user: postgres
+  postgresql_db: >
+     name=test_db_{{ item }}
+     state=absent
+  with_items: groups['applayer-hosts']
+
+- name: let db server listen on its internal interface
+  lineinfile: >
+      dest=/etc/postgresql/9.1/main/postgresql.conf
+      line="listen_addresses='{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}'"
+  notify:
+      - restart db server
+

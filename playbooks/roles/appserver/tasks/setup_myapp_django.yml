@@ -1,0 +1,212 @@
+#
+# Setup the Django environment for my app.
+#
+# At this time we know that the special user we created for
+# this app exists and that a virtual environment has been set
+# up. This is done with the additional playbooks that are
+# included from within playbooks/roles/appserver/tasks/main.yml.
+#
+# See the playbooks/roles/appserver/vars/main.yml file for the
+# specific variables used for this role.
+#
+
+---
+
+#
+# Using Ansible's "hg" module to access my mercurial repsotiroy.
+# This either clones or updates the repository, whatever the case
+# may be. If the sources haven't changed, nothing will be done.
+# The result of this is stored ("registered") the "source_version"
+# variable. That allows me to have some actions later on only if
+# the sources really were updated: Compiling of I8N strings, running
+# of tests, and so on.
+#
+- name: downloading source from repository
+  sudo_user: "{{ myapp_user_name }}"
+  hg: repo=ssh://hg@bitbucket.org/............. dest={{ repo_dir }}
+  register: source_version
+
+#
+# Ansible has a "pip" module, which I can point at the requirements
+# file that came with the code. Note also that we can tell the pip
+# module which virtualenv directory to use.
+#
+- name: installing requirements/{{ requirements_file }}
+  sudo_user: "{{ myapp_user_name }}"
+  pip: >
+    requirements={{ repo_dir }}/requirements/{{ requirements_file }}
+    virtualenv={{ install_dir }}
+
+#
+# Just in case I ever manually need to log into the host and use
+# django-admin.py or perform some actions in the Django environment,
+# I am creating a small shell script that I can run and that exports
+# all the right environment variable settings. I have a template for
+# it already, so I can just copy that template to the host, via the
+# "template" module.
+#
+- name: create file with env variables for Django environment
+  sudo_user: "{{ myapp_user_name }}"
+  template: src=temp_env.j2 dest=/home/{{ myapp_user_name }}/temp_env
+
+#
+# When I run unit tests, the results are stored in the /var/www directory.
+# Need to set the permissions here, so that my "myapp_user_name" user
+# can actually write into that directory.
+#
+- name: set permissions of /var/www directory, some test results may be stored there
+  file: >
+    path=/var/www owner={{ myapp_user_name }}
+    group={{ myapp_user_name }}
+    state=directory
+
+#
+# There are separate settings files for test and deployment. I will have to
+# modify those files shortly in order to update them with the actual DB host IP
+# address. These files came with the source code. However, if I modify them
+# directly, right here, then the next time the playbook is run, the "hg" module
+# (used above) will notice that the sources have changed and I will
+# unnecessarily re-run some of the things below. Therefore, I will make copies
+# of those files first (which of course won't be under version control), will
+# update the copies and use the copies for the running of tests or the server.
+# Thus, the settings files that we checked out from the repository won't need
+# to be modified.
+#
+# Honestly, this is very 'hacky'. A much simpler solution would be to have
+# the db-host address taken from an environment variable, just like how the
+# DB user and password are taken from an environmen variable. That way, I
+# wouldn't have to modify those files at all.
+#
+- name: make copies of the settings files
+  command: >
+    cp
+    {{ repo_dir }}/website/myapp/settings/deploy.py
+    {{ repo_dir }}/website/myapp/settings/deploy2.py
+- command: >
+    cp
+    {{ repo_dir }}/website/myapp/settings/test.py
+    {{ repo_dir }}/website/myapp/settings/test2.py
+
+- name: setting the DB server in deployment settings
+  sudo_user: "{{ myapp_user_name }}"
+  lineinfile: >
+    dest={{ repo_dir }}/website/myapp/settings/deploy2.py
+    line="DATABASES['default']['HOST'] = '{{ db_host_addr }}'"
+
+- name: setting the DB server in test settings
+  sudo_user: "{{ myapp_user_name }}"
+  lineinfile: >
+    dest={{ repo_dir }}/website/myapp/settings/test2.py
+    line="DATABASES['default']['HOST'] = '{{ db_host_addr }}'"
+
+#
+# Multiple appserver hosts may run their unit tests at the same time. Since
+# they are all connected to the same database server they can't all just use
+# the same test-DB name. The "inventory_hostname" variable is the name of
+# the current host from the inventory. Therfore, on each host, we specify
+# a unique name for the test-DB by appending that host name to the DB-name.
+#
+- name: setting the test database name
+  sudo_user: "{{ myapp_user_name }}"
+  lineinfile: >
+    dest={{ repo_dir }}/website/myapp/settings/test2.py
+    line="DATABASES['default']['TEST_NAME'] = 'test_db_{{ inventory_hostname }}'"
+
+#
+# The database may need to be synced and migrated and fixtures need to be
+# loaded. However, that only needs to be (and only can be) done once. Therefore,
+# we make this action dependent ("when:") on the condition that we are the first
+# host in the applayer-hosts group and that the sources have changed. This works
+# well, IF the first host doesn't have any problems. In reality, to make this
+# more stable, we should account for the possibility that the first host didn't
+# come up properly and that maybe a second host needs to take on this duty.
+#
+# Note how the environment that was defined in the vars/main.yml file is applied
+# to this command and how we are using the modified settings file ("deploy2").
+#
+- name: syncing and migrating the database
+  sudo_user: "{{ myapp_user_name }}"
+  shell: >
+    "{{ install_dir }}/bin/python" manage.py syncdb
+    --migrate --noinput --settings=myapp.settings.deploy2
+    executable=/bin/bash
+    chdir={{ pythonpath_dir }}
+  environment: django_env
+  when: inventory_hostname == groups['applayer-hosts'][0]  and  source_version.changed
+
+#
+# For internationalization, the messages need to be compiled. We only do this
+# if the sources have changed.
+#
+- name: compiling translated messages
+  sudo_user: "{{ myapp_user_name }}"
+  shell: >
+    "{{ install_dir }}/bin/python" manage.py compilemessages --settings=myapp.settings.deploy2
+    executable=/bin/bash
+    chdir={{ pythonpath_dir }}
+  environment: django_env
+  when: source_version.changed
+
+#
+# One of the nicest features of this playbook: All the unit tests are run (note
+# the modified "test2" settings file we are using for this.  If the unit tests
+# fail then this playbook fails and the server won't come up.
+#
+# Side effect: You know that only those servers go into the deployment, which
+# pass all their unit tests.
+#
+# A really cool additional feature would be this: With the cluster, bring up an
+# extra host, which just acts as a client to run against the front end load
+# balancer, just to check that the site serves pages, maybe to run some
+# selenium tests, etc. Then, after the tests have run, shut down the test host
+# and report the site as fully operational. That would be neat.
+#
+- name: running unit tests
+  sudo_user: "{{ myapp_user_name }}"
+  shell: >
+    "{{ install_dir }}/bin/python" manage.py test utils --settings=myapp.settings.test2
+    executable=/bin/bash
+    chdir={{ pythonpath_dir }}
+  environment: django_env
+  when: source_version.changed
+
+#
+# Don't look at this here too closely: You shouldn't run a production Django
+# server like this. I'm basically just stopping any currently running servers
+# and then run the plain Django built-in server. In reality, you would make
+# sure it's in some sort of re-starting process, gets run after reboot, etc.
+# So, these next two steps definitely need to be replaced with something more
+# solid.
+#
+
+#
+# Killing any existing Django server processes. Note the "ignore_errors"
+# directive.  That's because pkill will return an error if it didn't find
+# anything to kill. But that is of course not a problem for us, so we want to
+# ignore such an error.
+#
+- name: stopping django server
+  sudo_user: "{{ myapp_user_name }}"
+  command: pkill -f manage.py
+  ignore_errors: True
+
+#
+# Starting the Django server. Note the "async" and "poll" at the end.
+# Basically, we don't want Ansible to wait for the completion of this process.
+# We tell it to start it asynchronously, wait for some maximum time (10
+# seconds) and during that time poll for the status of the process every "poll"
+# seconds. However, by specifiying "0" for the poll interval, we are telling
+# Ansible to never poll at all. Therefore, this little hack allows us to start
+# a "fire and forget" process/task in the background while Ansible moves on.
+#
+- name: starting django server
+  sudo_user: "{{ myapp_user_name }}"
+  shell: >
+    "{{ install_dir }}/bin/python" manage.py
+    runserver 0.0.0.0:{{ appserver_port }} --settings=myapp.settings.deploy2 >& /var/tmp/django_log.txt &
+    executable=/bin/bash
+    chdir={{ pythonpath_dir }}
+  environment: django_env
+  async: 10
+  poll: 0
+

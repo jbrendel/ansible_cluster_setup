@@ -1,0 +1,6 @@
+#
+# Variables that only apply to Vagrant instances.
+#
+---
+ansible_ssh_user:                vagrant
+

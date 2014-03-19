@@ -1,0 +1,12 @@
+#
+# Application servers
+#
+
+---
+
+- name: configure application servers
+  hosts: applayer-hosts
+  sudo: yes
+  roles:
+    - appserver
+

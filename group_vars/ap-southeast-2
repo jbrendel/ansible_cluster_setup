@@ -1,0 +1,6 @@
+#
+# Variables that only apply to Sydney instances.
+#
+---
+ansible_ssh_private_key_file:    /home/jbrendel/cloud/aws/keys/jb_ap_southeast_2.pem
+

@@ -1,0 +1,23 @@
+#
+# Setup Nginx.
+#
+
+---
+
+- name: install nginx
+  apt: pkg=nginx state=present
+
+#
+# We create the config file for nginx, which defines a load balancing group.
+# However, if you look at the template we use for this, we are doing this in a
+# simplistic manner: Every host in the applayer group is added. In reality, we
+# should only add those hosts, which were setup correctly and have passed their
+# unit tests. Therefore, it would probably be better to add those successful
+# hosts into another dynamic group and then here in the template iterate over
+# that dynamically created group instead.
+#
+- name: set the nginx config file
+  template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default
+  notify:
+    - restart nginx
+

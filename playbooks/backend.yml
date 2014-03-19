@@ -1,0 +1,12 @@
+#
+# Backend servers
+#
+
+---
+
+- name: configure backend servers
+  hosts: backend-hosts
+  sudo: yes
+  roles:
+    - dbserver
+

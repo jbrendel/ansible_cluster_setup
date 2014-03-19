@@ -1,0 +1,12 @@
+#
+# Apply to all servers
+#
+
+---
+
+- name: basic configs on all servers
+  hosts: frontend-hosts:applayer-hosts:backend-hosts
+  sudo: yes
+  roles:
+    - common
+

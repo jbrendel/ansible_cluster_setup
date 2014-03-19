@@ -1,0 +1,7 @@
+
+These keys are uploaded to the repository as well as deployment machines,
+allowing them to access the repo in read-only mode.
+
+The .pub file was presented to Bitbucket and registered as a deployment key.
+The private file needs to be synced onto the the deployment machine.
+

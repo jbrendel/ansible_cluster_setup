@@ -1,0 +1,26 @@
+[ap-southeast-2]
+load_balancer ansible_ssh_host=54.206.128.223
+app_host_1    ansible_ssh_host=54.206.128.242
+app_host_2    ansible_ssh_host=54.206.173.252
+db_host       ansible_ssh_host=54.252.80.84
+
+
+[frontend-hosts]
+load_balancer
+
+[applayer-hosts]
+app_host_1
+app_host_2
+
+[backend-hosts]
+db_host
+
+
+[db-access:children]
+applayer-hosts
+backend-hosts
+
+[appserver-access:children]
+frontend-hosts
+applayer-hosts
+

@@ -1,0 +1,49 @@
+#
+# Create the user and group, setting up SSH
+#
+
+---
+
+- name: Create {{ myapp_group_name }} group...
+  group: name={{ myapp_group_name }} state=present
+
+- name: Create {{ myapp_user_name }} user...
+  user: >
+    name={{ myapp_user_name }}
+    state=present
+    groups={{ myapp_group_name }}
+    shell=/bin/bash
+
+#
+# We check for the presence of the deployment key to see if we have to go through the
+# next couple of steps.
+#
+- name: check if deployment key file in place
+  stat: path=/home/{{ myapp_user_name }}/.ssh/id_rsa
+  register: key_file_check
+
+- name: create .ssh directory for user
+  sudo_user: "{{ myapp_user_name }}"
+  file: path=/home/{{ myapp_user_name }}/.ssh state=directory 
+  when: key_file_check.stat.exists == false
+
+- name: copy deployment key file
+  sudo_user: "{{ myapp_user_name }}"
+  copy: >
+    src=deployment_keys/id_rsa
+    dest=/home/{{ myapp_user_name }}/.ssh/id_rsa
+    owner={{ myapp_user_name}}
+    group={{ myapp_user_name}}
+    mode=0600
+  when: key_file_check.stat.exists == false
+
+#
+# Doing this scan will prevent interactive prompts later on
+# when the "hg" module tries to connect to the repo.
+#
+- name: add the key for bitbucket.org to the known_host file
+  sudo_user: "{{ myapp_user_name }}"
+  shell: ssh-keyscan -H bitbucket.org > ~/.ssh/known_hosts
+  when: key_file_check.stat.exists == false
+
+

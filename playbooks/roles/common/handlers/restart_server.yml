@@ -1,0 +1,9 @@
+#
+# A handler to restart the server
+#
+
+---
+
+- name: restart server
+  command: /sbin/reboot -t now
+

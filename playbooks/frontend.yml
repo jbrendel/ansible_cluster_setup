@@ -1,0 +1,12 @@
+#
+# Frontend servers
+#
+
+---
+
+- name: configure frontend servers
+  hosts: frontend-hosts
+  sudo: yes
+  roles:
+    - webserver
+

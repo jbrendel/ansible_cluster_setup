@@ -1,0 +1,7 @@
+#
+# Information needed for appserver network access
+#
+
+---
+appserver_port:             8091
+

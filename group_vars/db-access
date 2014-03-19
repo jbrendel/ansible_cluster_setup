@@ -1,0 +1,11 @@
+#
+# Information needed for database access
+#
+
+---
+myapp_db_user_name:             myapp
+myapp_db_user_password:         my_super_secret_db_password
+myapp_db_name:                  myapp_db
+db_host_addr:                   "{{ hostvars[groups['backend-hosts'][0]]['ansible_eth0']['ipv4']['address'] }}"
+
+

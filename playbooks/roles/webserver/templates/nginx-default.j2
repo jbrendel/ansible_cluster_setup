@@ -1,0 +1,15 @@
+upstream {{ ansible_ssh_host }}  {
+{% for host in groups['applayer-hosts'] %}
+   server {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}:{{ appserver_port }} ;
+{% endfor %}
+}
+
+server {
+  listen 80;
+
+  location / {
+    proxy_pass  http://{{ ansible_ssh_host }};
+  }
+
+}
+

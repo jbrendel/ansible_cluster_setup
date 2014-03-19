@@ -1,0 +1,38 @@
+#
+# Variables for our appserver hosts.
+#
+
+---
+
+#
+# User
+#
+
+myapp_group_name:               myapp-users                                           
+myapp_user_name:                myapp
+
+#
+# For the virtualenv setup
+#
+
+install_dir:                     /home/{{ myapp_user_name}}/site
+repo_dir:                        "{{ install_dir }}/repo"
+requirements_file:               local.txt
+pythonpath_dir:                  "{{ repo_dir }}/website"
+
+#
+# For the Django environment
+#
+
+django_env:
+  DJANGO_SETTINGS_MODULE: "myapp.settings.deploy"
+  DJANGO_SECRET_KEY:      "0n98u4j098j75tf789nudmnmf0934jfhmomu09mj3ny"
+  DJANGO_DB_NAME:         "{{ myapp_db_name }}"
+  DJANGO_DB_USER:         "{{ myapp_db_user_name }}"
+  DJANGO_DB_PASSWORD:     "{{ myapp_db_user_password }}"
+  DJANGO_DB_HOST:         "{{ db_host_addr }}"
+  DJANGO_SERVER_DNS:      "example.brendel.com"
+  DJANGO_SERVER_SCHEMA:   "http://"
+  DJANGO_SERVER_PORT:     "{{ appserver_port }}"
+
+

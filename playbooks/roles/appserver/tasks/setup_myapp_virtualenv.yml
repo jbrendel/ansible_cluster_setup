@@ -1,0 +1,16 @@
+#
+# Setup the virtualenv for the installation.
+#
+
+---
+
+#
+# Create the virtualenv (only if it doesn't exist already)
+#
+
+- name: create the virtualenv in a new directory
+  sudo_user: "{{ myapp_user_name }}"
+  command: >
+      virtualenv --distribute --no-site-packages {{ install_dir }}
+                                                 creates={{ install_dir }}/bin
+

@@ -1,0 +1,29 @@
+#
+# We define the same group structure, but leave the
+# groups empty. They are populated dynamically when
+# the EC2 instances are created.
+#
+localhost ansible_connection=local
+
+
+[ap-southeast-2]
+
+[frontend-hosts]
+
+[applayer-hosts]
+
+[backend-hosts]
+
+[db-access:children]
+applayer-hosts
+backend-hosts
+
+[appserver-access:children]
+frontend-hosts
+applayer-hosts
+
+
+
+
+
+

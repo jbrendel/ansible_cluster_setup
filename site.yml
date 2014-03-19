@@ -1,0 +1,11 @@
+#
+# Complete cluster setup
+# 
+
+---
+
+- include: playbooks/common.yml
+- include: playbooks/backend.yml
+- include: playbooks/applayer.yml
+- include: playbooks/frontend.yml
+

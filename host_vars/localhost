@@ -1,0 +1,12 @@
+#
+# The variables to determine our EC2 instantiations
+#
+
+ec2_key_name:           .....                    # The name of your SSH host-access key in that region
+ec2_instance_type:      t1.micro                 # Replace with the instance type you want.
+ec2_security_group:     .....                    # The name of your security group in that region.
+ec2_image:              ami-0729b73d             # This is a Ubuntu 13.10 (64 bit) image. Replace as needed.
+ec2_region:             ap-southeast-2           # This is the Sydney data center. Change as needed.
+ec2_instance_count:     5                        # How many hosts to start.
+
+

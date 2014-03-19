@@ -1,0 +1,16 @@
+#
+# Perform a system update.
+#
+# Issue a notification to a "restart server" handler (if an update took place).
+#
+
+---
+
+- name: updating the system
+  apt: update_cache=yes cache_valid_time=86400
+  notify:
+  - restart server
+
+- name: reinstalling the language pack
+  command: apt-get -y install --reinstall language-pack-en
+

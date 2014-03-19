@@ -1,0 +1,9 @@
+#
+# A handler to restart the db server
+#
+
+---
+
+- name: restart db server
+  service: name=postgresql state=restarted
+

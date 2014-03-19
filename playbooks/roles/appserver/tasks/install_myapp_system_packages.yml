@@ -1,0 +1,21 @@
+#
+# Install the system packages needed for our MyApp installation.
+#
+
+---
+
+- name: install all necessary packages
+  apt: pkg={{ item }} state=present
+  with_items:
+      - build-essential
+      - mercurial
+      - vim-runtime
+      - vim
+      - daemontools
+      - python-virtualenv
+      - python-dev
+      - python-pip
+      - gettext
+      - python-psycopg2
+      - libpq-dev
+
