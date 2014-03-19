@@ -68,7 +68,8 @@ the following settings and files:
 
     playbooks/roles/appserver/tasks/setup_myapp_django.yml
 
-        - First step: The repo address.
+        - First step: The repo address. This should obviously be the
+          address of your own repository.
         - The modification of the settings files.
         - The running of the unit tests.
         - The running of the Django server.
@@ -88,6 +89,18 @@ the following settings and files:
           hosts to pull down the source from the repository. You will need to
           place your own file (something like an "id_rsa" file) into that
           directory.
+
+
+Vagrant
+-------
+There is also a Vargantfile if you wish to start VMs locally for testing or
+development. It uses the vagrant_hosts inventory file. As you can see in that
+inventory file, the same host appears in all groups. That's ok, Ansible can
+wire it all up anyway, whether the various components run on different hosts
+or on the same host.
+
+With that Vagrantfile in place, just do "$ vagrant up" and you'll be in
+business.
 
 
 Closing comments
