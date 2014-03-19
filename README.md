@@ -122,17 +122,21 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Use variables to change the repository and repo type (git or hg).
+- Use variables to change the repository address and type (git or hg).
 - Better handling of Django settings files (use environment variables,
   rather than patching).
 - Make sure only running appservers are added to load balancing group.
 - Better, solid deployment of Django as re-starting service.
 - Add support for DigitalOcean as alternative to EC2.
-- Setup database cluster with failover.
+- Setup database cluster with failover, if possible.
 - Extend Vagrantfile (or offer second version) that brings up multiple
   Vagrant VMs.
 - Add site-testing, either as extra host or as role on the web server
   host: Hitting the finished cluster with Selenium or similar to test
   basic site connectivity.
 - Adding monitoring and alerts.
+- Amazon: Support Amazon RDS
+- Amazon: Support Amazon load balancer.
+- Amazon: Support adding servers to auto-scale groups.
+
 
