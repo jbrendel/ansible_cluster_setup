@@ -122,6 +122,8 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
+- Use an 'external variable file' to define all personally relevant
+  data, such as passwords, repo addresses, ports, EC2 keys, etc.
 - Use variables to change the repository address and type (git or hg).
 - Better handling of Django settings files (use environment variables,
   rather than patching).
