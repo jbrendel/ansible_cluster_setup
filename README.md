@@ -83,6 +83,11 @@ the following settings and files:
         - All the EC2 related settings. They are in a file called "localhost",
           because the EC2 module is run in the local host.
 
+    group_vars/ap-southeast-2
+
+        - The path to the local copy of your SSH access key for this EC2
+          region. You'll have different var-files for different regions.
+
     playbooks/roles/appserver/files/deployment_keys/
 
         - In this directory we store the deployment keys that are used by the
