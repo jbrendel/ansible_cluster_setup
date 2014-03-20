@@ -30,7 +30,7 @@
 - name: copy deployment key file
   sudo_user: "{{ myapp_user_name }}"
   copy: >
-    src=deployment_keys/id_rsa
+    src={{ EXT.REPO.deployment_key }}
     dest=/home/{{ myapp_user_name }}/.ssh/id_rsa
     owner={{ myapp_user_name}}
     group={{ myapp_user_name}}
@@ -38,12 +38,12 @@
   when: key_file_check.stat.exists == false
 
 #
-# Doing this scan will prevent interactive prompts later on
+# Doing this scan on the repo host will prevent interactive prompts later on
 # when the "hg" module tries to connect to the repo.
 #
-- name: add the key for bitbucket.org to the known_host file
+- name: add the key for repository host to the known_host file
   sudo_user: "{{ myapp_user_name }}"
-  shell: ssh-keyscan -H bitbucket.org > ~/.ssh/known_hosts
+  shell: ssh-keyscan -H {{ EXT.REPO.host }} > ~/.ssh/known_hosts
   when: key_file_check.stat.exists == false
 
 

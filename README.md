@@ -23,32 +23,40 @@ To get Ansible, just do:
 If you have actual servers with IP addresses already, you can use
 something like the "hosts" inventory file and "site.yml" playbook.
 
-    $ ansible-playbook -i hosts site.yml
+    $ ansible-playbook -i hosts -e "@vars/extra_vars.yml" site.yml
 
-We also have a second option, in which Ansible will create on its
-own a number of hosts on Amazon EC2 and fully provision and configure
-them in the cluster. This is really useful to easily setup new
-test clusters, or to show customers what you're working on, etc.,
-or maybe even for the actual deployment cluster.
+For information about the "extra_vars.yaml", please see the chapter
+below about "Modifications for your own projects".
 
-Ansible isn't limited to EC2, it could also work with Rackspace or
-DigitalOcean (it has modules for those).
+We also have a second option, in which Ansible will create on its own a number
+of hosts on a specified cloud provider and fully provision and configure them
+in the cluster. This is really useful to easily setup new test clusters, or to
+show customers what you're working on, etc., or maybe even for the actual
+deployment cluster.
+
+Currently, we are supporting only Amazon EC2, but support for other providers
+is already planned.
 
 
-Dynamically created EC2 host instances
---------------------------------------
-If you wish to use dynamically created instanced on Amazon EC2, use
-the "ec2_hosts" inventory file and "ec2_site.yml" playbook.
+Dynamically created cloud host instances
+----------------------------------------
+If you wish to use dynamically created instanced on Amazon EC2 or another
+cloud provoider, use the "cloud_hosts" inventory file and "cloud_site.yml"
+playbook.
 
-    $ ansible-playbook -i ec2_hosts ec2_site.yml
+    $ ansible-playbook -i cloud_hosts  -e "@vars/extra_vars.yml" cloud_site.yml
 
-Please make sure that these environment variables are set:
+Specify the cloud provider you wish to use in EXT.ARCHITECTURE.cloud_provider.
+Currently, only "ec2" is supported.
 
-    AWS_SECRET_ACCESS_KEY=....
-    AWS_ACCESS_KEY_ID=...
+For Amazon EC2:
+    Please make sure that these environment variables are set:
 
-The values for those variables will be given to you when you create
-an Amazon EC2 account.
+        AWS_SECRET_ACCESS_KEY=....
+        AWS_ACCESS_KEY_ID=...
+
+    The values for those variables will be given to you when you create
+    an Amazon EC2 account.
 
 
 Modifications for your own projects
@@ -56,11 +64,13 @@ Modifications for your own projects
 If you wish to use this for your own projects, you will need to modify
 the following settings and files:
 
-    playbooks/roles/appserver/tasks/create_myapp_user.yml
+    vars/extra_vars.yml
 
-        - In the last step we are doing an SSH keyscan on the bitbucket
-          site. If you use github or another repo site, you might want
-          to use that instead.
+        - Here you need to define all the customizable settings, such
+          as passwords, usernames, paths for key files, desired EC2
+          regions, security groups, as well as the number of hosts
+          that should be created. An example template is provided
+          in vars/example_extra_vars.yml.
 
     playbooks/roles/appserver/tasks/install_myapp_system_packages.yml
 
@@ -68,37 +78,13 @@ the following settings and files:
 
     playbooks/roles/appserver/tasks/setup_myapp_django.yml
 
-        - First step: The repo address. This should obviously be the
-          address of your own repository.
         - The modification of the settings files.
         - The running of the unit tests.
         - The running of the Django server.
 
-    playbooks/roles/appserver/vars/main.yml
-
-        - All the settings in there, as needed.
-
-    host_vars/localhost
-
-        - All the EC2 related settings. They are in a file called "localhost",
-          because the EC2 module is run in the local host.
-
-    group_vars/ap-southeast-2
-
-        - The path to the local copy of your SSH access key for this EC2
-          region. You'll have different var-files for different regions.
-
-    playbooks/roles/appserver/files/deployment_keys/
-
-        - In this directory we store the deployment keys that are used by the
-          hosts to pull down the source from the repository. You will need to
-          place your own file (something like an "id_rsa" file) into that
-          directory.
-
-
 Vagrant
 -------
-There is also a Vargantfile if you wish to start VMs locally for testing or
+There is also a Vgrantfile if you wish to start VMs locally for testing or
 development. It uses the vagrant_hosts inventory file. As you can see in that
 inventory file, the same host appears in all groups. That's ok, Ansible can
 wire it all up anyway, whether the various components run on different hosts
@@ -122,9 +108,6 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Use an 'external variable file' to define all personally relevant
-  data, such as passwords, repo addresses, ports, EC2 keys, etc.
-- Use variables to change the repository address and type (git or hg).
 - Better handling of Django settings files (use environment variables,
   rather than patching).
 - Make sure only running appservers are added to load balancing group.

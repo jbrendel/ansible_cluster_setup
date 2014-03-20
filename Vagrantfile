@@ -8,9 +8,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network "private_network", ip: "192.168.99.99"
 
   config.vm.provision "ansible" do |ansible|
-     ansible.playbook         = "site.yml"
+     ansible.playbook          = "site.yml"
      #ansible.verbose          = "vvvv"
-     ansible.inventory_path   = "vagrant_hosts"
+     ansible.inventory_path    = "vagrant_hosts"
+     ansible.extra_vars        = "vars/extra_vars.yml"
      ansible.host_key_checking = false
   end
 end

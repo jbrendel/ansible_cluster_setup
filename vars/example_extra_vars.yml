@@ -1,0 +1,65 @@
+#
+# Variables that apply to all our hosts.
+#
+
+---
+#
+# These are all the specific variables for your deployment.
+# Things that need to be set and known by Ansible for its
+# run, but which you wouldn't want to check in or put under
+# source control: Passwords, repo URLs, keyfile locations,
+# etc.
+#
+
+EXT:
+    ssh_user:           "ubuntu"
+
+    ARCHITECTURE:
+        cloud_provider: "ec2"                              # one of the supported providers, currently
+                                                           # "ec2". Each of those providers requires
+                                                           # a section of variables below, starting
+                                                           # below, such as "EXT.EC2" or similar.
+        num_hosts:      5                                  # the number of hosts you wish to create
+                                                           # this setting is only used when Ansible
+                                                           # performs the host initialization, for
+                                                           # example via EC2.
+
+    REPO:
+        host:           "bitbucket.org"
+        url:            "ssh://hg@bitbucket.org/......."   # complete the repository URL
+        deployment_key: "/home/localuser/..."              # path to the deployment key file
+
+    DJANGO:
+        secret:         "....."                            # the Django secret
+        schema:         "http://"
+        dns:            "www.example.com"                  # the domain name for the Django server
+
+    USERS:
+        deploy_user:    "myapp"                            # user account created on host, running the appserver
+        deploy_group:   "myapp-users"                      # group for that account
+
+    DATABASE:
+        db_user:        "myapp_db_user"                    # the database user
+        db_password:    "super secret password"            # the database password
+        db_name:        "myapp_db"                         # the database name
+
+
+    #
+    # These EC2 specific settings are only used by "ec2_site.yml". With "site.yml"
+    # they are ignored.
+    #
+    # Note that "EC2.region" specifies where you wish to deploy the cluster. The
+    # region you specify in that variable needs to be present in the "EC2.regions_settings"
+    # dictionary and will have to have all its specifics defined there.
+    #
+    EC2:
+        region:         "ap-southeast-2"                   # the EC2 region in which you want to deploy
+        instance_type:  "t1.micro"                         # the instance type you wish to create
+        regions_settings:
+            ap-southeast-2:
+                ssh_key_name:       "....."                # your SSH access key name, as it is known to EC2
+                private_key_file:   "/home/localuser....." # path to your local copy of the EC2 SSH access key
+                security_group:     "....."                # name of the EC2 security group you wish to use
+                image:              "ami-0729b73d"         # the EC2 image ID (this, for example, is Ubuntu 13.10 64 bit)
+
+

@@ -1,10 +1,10 @@
 #
-# Complete cluster setup with instance creation on EC2
+# Complete cluster setup with instance creation in cloud
 # 
 
 ---
 
-- include: playbooks/ec2_start.yml
+- include: playbooks/{{ EXT.ARCHITECTURE.cloud_provider }}_start.yml
 - include: playbooks/common.yml
 - include: playbooks/backend.yml
 - include: playbooks/applayer.yml

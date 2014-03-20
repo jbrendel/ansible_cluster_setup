@@ -23,7 +23,7 @@
 #
 - name: downloading source from repository
   sudo_user: "{{ myapp_user_name }}"
-  hg: repo=ssh://hg@bitbucket.org/............. dest={{ repo_dir }}
+  hg: repo={{ EXT.REPO.url }} dest={{ repo_dir }}
   register: source_version
 
 #

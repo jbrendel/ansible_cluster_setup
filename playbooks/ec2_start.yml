@@ -37,7 +37,7 @@
     # settings.
     #
     - name: add new instance to {{ ec2_region }} group
-      local_action: add_host hostname={{ item.public_ip }} groupname={{ ec2_region }}
+      local_action: add_host hostname={{ item.public_ip }} groupname=ec2-hosts
       with_items: ec2results.instances
 
     #

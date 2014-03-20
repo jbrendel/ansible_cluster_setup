@@ -8,8 +8,8 @@
 # User
 #
 
-myapp_group_name:               myapp-users                                           
-myapp_user_name:                myapp
+myapp_group_name:               "{{ EXT.USERS.deploy_group }}"
+myapp_user_name:                "{{ EXT.USERS.deploy_user }}"
 
 #
 # For the virtualenv setup
@@ -26,13 +26,13 @@ pythonpath_dir:                  "{{ repo_dir }}/website"
 
 django_env:
   DJANGO_SETTINGS_MODULE: "myapp.settings.deploy"
-  DJANGO_SECRET_KEY:      "0n98u4j098j75tf789nudmnmf0934jfhmomu09mj3ny"
+  DJANGO_SECRET_KEY:      "{{ EXT.DJANGO.secret }}"
   DJANGO_DB_NAME:         "{{ myapp_db_name }}"
   DJANGO_DB_USER:         "{{ myapp_db_user_name }}"
   DJANGO_DB_PASSWORD:     "{{ myapp_db_user_password }}"
   DJANGO_DB_HOST:         "{{ db_host_addr }}"
-  DJANGO_SERVER_DNS:      "example.brendel.com"
-  DJANGO_SERVER_SCHEMA:   "http://"
+  DJANGO_SERVER_DNS:      "{{ EXT.DJANGO.dns }}"
+  DJANGO_SERVER_SCHEMA:   "{{ EXT.DJANGO.schema }}"
   DJANGO_SERVER_PORT:     "{{ appserver_port }}"
 
 

@@ -19,10 +19,10 @@
 
 - name: configure postgres user
   sudo_user: postgres
-  postgresql_user: >
-      name={{ myapp_db_user_name}}
-      password={{ myapp_db_user_password }}
-      role_attr_flags=CREATEDB
+  postgresql_user:
+      name:             "{{ myapp_db_user_name}}"
+      password:         "{{ myapp_db_user_password }}"
+      role_attr_flags:  CREATEDB
 
 - name: create database
   sudo_user: postgres

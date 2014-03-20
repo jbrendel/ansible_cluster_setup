@@ -1,0 +1,7 @@
+#
+# Variables that only apply to Amazon EC2 hosts.
+#
+---
+ansible_ssh_user:                "{{ EXT.ssh_user }}"
+ansible_ssh_private_key_file:    "{{ EXT.EC2.regions_settings[EXT.EC2.region].private_key_file }}"
+

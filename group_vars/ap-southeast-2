@@ -1,6 +1,0 @@
-#
-# Variables that only apply to Sydney instances.
-#
----
-ansible_ssh_private_key_file:    .......    # path to your local copy of your SSH access key for this region
-
