@@ -1,0 +1,19 @@
+#
+# Dump the current inventory into a file.
+#
+# This is useful for dynamically created inventories, so that we have
+# an iventory file that can be used to re-start provisioning actions
+# against a cluster.
+#
+
+---
+
+- name: dump inventory file
+  hosts: localhost
+  gather_facts: False
+
+  tasks:
+    - template:
+        src:  templates/cloud_inventory.j2
+        dest: "{{ EXT.ARCHITECTURE.cloud_inventory_dump_file }}"
+

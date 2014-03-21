@@ -23,6 +23,7 @@ EXT:
                                                            # this setting is only used when Ansible
                                                            # performs the host initialization, for
                                                            # example via EC2.
+        cloud_inventory_dump_file:  "/var/tmp/cloud_inv"   # dynamically generated inventory is dumped here 
 
     REPO:
         host:           "bitbucket.org"

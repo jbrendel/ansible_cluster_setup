@@ -5,6 +5,12 @@
 #
 localhost ansible_connection=local
 
+[ec2-hosts]
+
+[digitalocean-hosts]
+
+[rackspace-hosts]
+
 [frontend-hosts]
 
 [applayer-hosts]

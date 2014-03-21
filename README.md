@@ -49,6 +49,14 @@ playbook.
 Specify the cloud provider you wish to use in EXT.ARCHITECTURE.cloud_provider.
 Currently, only "ec2" is supported.
 
+After this playbook has run, a fully populated inventory file can be found
+in the location specified by EXT.ARCHITECTURE.cloud_inventory_dump_file. This
+inventory file can be used to run the normal site.yml playbook against an
+existing, dynamically created cluster, in case you wish to re-visit a host
+or modify some settings in the already running instances.
+
+    $ ansible-playbook -i /var/tmp/cloud_inv -e "@vars/extra_vars.yml" site.yml
+
 For Amazon EC2:
     Please make sure that these environment variables are set:
 
@@ -108,6 +116,7 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
+- Create local copy of dynamic inventory (for ongoing maintenance).
 - Better handling of Django settings files (use environment variables,
   rather than patching).
 - Make sure only running appservers are added to load balancing group.

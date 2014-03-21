@@ -1,0 +1,35 @@
+
+localhost ansible_connection=local
+
+[ec2-hosts]
+{% for host in groups['ec2-hosts'] %}
+{{ host }}
+{% endfor %}
+
+[digitalocean-hosts]
+
+[rackspace-hosts]
+
+[frontend-hosts]
+{% for host in groups['frontend-hosts'] %}
+{{ host }} ansible_ssh_host={{ host }}
+{% endfor %}
+
+[applayer-hosts]
+{% for host in groups['applayer-hosts'] %}
+{{ host }}
+{% endfor %}
+
+[backend-hosts]
+{% for host in groups['backend-hosts'] %}
+{{ host }}
+{% endfor %}
+
+[db-access:children]
+applayer-hosts
+backend-hosts
+
+[appserver-access:children]
+frontend-hosts
+applayer-hosts
+
