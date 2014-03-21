@@ -7,6 +7,9 @@ localhost ansible_connection=local
 {% endfor %}
 
 [digitalocean-hosts]
+{% for host in groups['digitalocean-hosts'] %}
+{{ host }}
+{% endfor %}
 
 [rackspace-hosts]
 

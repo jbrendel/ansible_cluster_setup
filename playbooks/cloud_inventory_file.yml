@@ -5,6 +5,9 @@
 # an iventory file that can be used to re-start provisioning actions
 # against a cluster.
 #
+# This assumes that the 'timestamp' variable was registered in the
+# *_start.yml playbook.
+#
 
 ---
 
@@ -15,5 +18,5 @@
   tasks:
     - template:
         src:  templates/cloud_inventory.j2
-        dest: "{{ EXT.ARCHITECTURE.cloud_inventory_dump_file }}"
+        dest: "{{ EXT.ARCHITECTURE.cloud_inventory_dump_file }}-{{ timestamp.stdout }}"
 

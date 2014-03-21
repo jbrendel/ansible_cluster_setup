@@ -1,5 +1,5 @@
 #
-# Variables that apply to all our hosts.
+# Customizable parameters for a cluster.
 #
 
 ---
@@ -15,15 +15,17 @@ EXT:
     ssh_user:           "ubuntu"
 
     ARCHITECTURE:
-        cloud_provider: "ec2"                              # one of the supported providers, currently
-                                                           # "ec2". Each of those providers requires
-                                                           # a section of variables below, starting
-                                                           # below, such as "EXT.EC2" or similar.
-        num_hosts:      5                                  # the number of hosts you wish to create
+        cloud_provider: "ec2"                              # One of the supported providers, currently
+                                                           # "ec2" and "digitalocean". Each of those
+                                                           # providers requires a section of variables
+                                                           # below, starting below, such as "EXT.EC2"
+                                                           # or similar.
+        num_hosts:      5                                  # The number of hosts you wish to create
                                                            # this setting is only used when Ansible
                                                            # performs the host initialization, for
                                                            # example via EC2.
-        cloud_inventory_dump_file:  "/var/tmp/cloud_inv"   # dynamically generated inventory is dumped here 
+        cloud_inventory_dump_file:  "/var/tmp/cloud_inv"   # Dynamically generated inventory is dumped here 
+                                                           # (random number will be added to filename).
 
     REPO:
         host:           "bitbucket.org"
@@ -46,8 +48,9 @@ EXT:
 
 
     #
-    # These EC2 specific settings are only used by "ec2_site.yml". With "site.yml"
-    # they are ignored.
+    # These EC2 specific settings are only used by "cloud_site.yml" and if
+    # EXT.ARCHITECTURE.cloud_provider is set to "ec2". With "site.yml" or
+    # a different cloud provider, they are ignored.
     #
     # Note that "EC2.region" specifies where you wish to deploy the cluster. The
     # region you specify in that variable needs to be present in the "EC2.regions_settings"
@@ -63,4 +66,31 @@ EXT:
                 security_group:     "....."                # name of the EC2 security group you wish to use
                 image:              "ami-0729b73d"         # the EC2 image ID (this, for example, is Ubuntu 13.10 64 bit)
 
+
+    #
+    # These DigitalOcean specific settings are only used by "cloud_site.yml" and if
+    # EXT.ARCHITECTURE.cloud_provider is set to "digitalocean". With "site.yml" or
+    # a different cloud provider, they are ignored.
+    #
+    DIGITALOCEAN:
+        client_id:      "..."                              # your client ID (see under API on their web site)
+        api_key:        "..."                              # your API KEY (see under API on their web site)
+        ssh_key_file:   "..."                              # path to your SSH key file for your registered SSH key
+        ssh_key_id:     ...                                # SSH key ID: Can only be found via API 
+        # Currently supported regions:
+        #     San Francisco:        3
+        #     New York:             4
+        #     Amsterdam:            5
+        #     Singapore:            6
+        region:         3
+        # Many different images. This one here is Ubuntu 13.10 64 bit.
+        image:          1505699
+        # Currently supported sizes:
+        #     512 MB:               66
+        #     1 GB:                 63
+        #     2 GB:                 62
+        #     4 GB:                 64
+        #     8 GB:                 65
+        #     ...
+        size:           66
 

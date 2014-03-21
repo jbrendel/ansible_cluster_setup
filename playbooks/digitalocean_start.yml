@@ -1,12 +1,12 @@
 #
-# Actions on the localhost: Bring up EC2 instances and add to our groups
+# Actions on the localhost: Bring up DigitalOcean instances and add to our groups
 #
 
 ---
 #
 # This playbook runs actions not on some remote server, but on the local
-# host on which Ansible is running. It uses the "ec2" module to dynamically
-# create hosts.
+# host on which Ansible is running. It uses the "digital_ocean" module to
+# dynamically create hosts.
 #
 - name: create the cluster hosts
   hosts: localhost
@@ -19,19 +19,22 @@
       register: timestamp
 
     #
-    # Using the "ec2" module, we create some number of hosts. All those
+    # Using the "digital_ocean" module, we create some number of hosts. All those
     # variables here just specify the parameters, access keys, image types,
     # and so on.
     #
-    # The module returns references to all the created instances. We remember
-    # ("register") them in the variable "ec2results".
-    #
-    - name: launch ec2 instances
+    - name: launch digital-ocean instances
       local_action: >
-        ec2 key_name={{ ec2_key_name }} group={{ ec2_security_group }}
-            instance_type={{ ec2_instance_type }} image={{ ec2_image }}
-            wait=true region={{ ec2_region }} count={{ ec2_instance_count }}
-      register: ec2results
+        digital_ocean state=present command=droplet name=droplet-{{ timestamp.stdout }}-{{ item }}
+                      client_id={{ EXT.DIGITALOCEAN.client_id }}
+                      api_key={{ EXT.DIGITALOCEAN.api_key }}
+                      size_id={{ EXT.DIGITALOCEAN.size }}
+                      region_id={{ EXT.DIGITALOCEAN.region }}
+                      image_id={{ EXT.DIGITALOCEAN.image }}
+                      ssh_key_ids={{ EXT.DIGITALOCEAN.ssh_key_id }}
+                      wait_timeout=500
+      with_sequence: count={{ EXT.ARCHITECTURE.num_hosts }}
+      register: droplet_instances
 
     #
     # Now we dynamically add all those hosts ("with items: # ec2results.instances")
@@ -41,9 +44,9 @@
     # That allows us to specify a variable file with the region-sepecific
     # settings.
     #
-    - name: add new instance to ec2-hosts group
-      local_action: add_host hostname={{ item.public_ip }} groupname=ec2-hosts
-      with_items: ec2results.instances
+    - name: add new instance to digitalocean-hosts group
+      local_action: add_host hostname={{ item.droplet.ip_address }} groupname=digitalocean-hosts
+      with_items: droplet_instances.results
 
     #
     # We take one (the first) of those machines to populate the frontend group.
@@ -53,8 +56,8 @@
     #
     - name: add new instances to frontend group
       local_action: >
-        add_host hostname={{ ec2results.instances[0].public_ip }}
-                 ansible_ssh_host={{ ec2results.instances[0].public_ip }}
+        add_host hostname={{ droplet_instances.results[0].droplet.ip_address }}
+                 ansible_ssh_host={{ droplet_instances.results[0].droplet.ip_address }}
                  groupname=frontend-hosts
 
     #
@@ -62,16 +65,16 @@
     #
     - name: add new instances to backend group
       local_action: >
-        add_host hostname={{ ec2results.instances[1].public_ip }}
+        add_host hostname={{ droplet_instances.results[1].droplet.ip_address }}
                  groupname=backend-hosts
 
     #
     # All the remaining hosts are added to the applayer host group.
     - name: add new instances to applayer group
       local_action: >
-        add_host hostname={{ item.public_ip }}
+        add_host hostname={{ item.droplet.ip_address }}
         groupname=applayer-hosts
-      with_items: ec2results.instances[2:]
+      with_items: droplet_instances.results[2:]
 
     #
     # We won't proceed until we have confirmed that we have SSH access to
@@ -80,7 +83,7 @@
     #
     - name: wait for SSH to come up
       local_action: >
-        wait_for host={{ item.public_dns_name }} port=22
+        wait_for host={{ item.droplet.ip_address }} port=22
                  delay=10 timeout=320 state=started
-      with_items: ec2results.instances
+      with_items: droplet_instances.results
 

@@ -6,8 +6,8 @@
 
 - include: playbooks/{{ EXT.ARCHITECTURE.cloud_provider }}_start.yml
 - include: playbooks/cloud_inventory_file.yml
-- include: playbooks/common.yml
-- include: playbooks/backend.yml
-- include: playbooks/applayer.yml
-- include: playbooks/frontend.yml
+
+- include: site.yml
+
+- include: playbooks/print_message.yml
 
