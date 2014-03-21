@@ -129,7 +129,7 @@ Todo
   rather than patching).
 - Make sure only running appservers are added to load balancing group.
 - Better, solid deployment of Django as re-starting service.
-- Add support for DigitalOcean as alternative to EC2.
+- Add support for Rackspace as alternative to EC2 and DigitalOcean.
 - Setup database cluster with failover, if possible.
 - Extend Vagrantfile (or offer second version) that brings up multiple
   Vagrant VMs.
