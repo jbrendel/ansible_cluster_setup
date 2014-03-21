@@ -47,7 +47,7 @@ playbook.
     $ ansible-playbook -i cloud_hosts  -e "@vars/extra_vars.yml" cloud_site.yml
 
 Specify the cloud provider you wish to use in EXT.ARCHITECTURE.cloud_provider.
-Currently, only "ec2" is supported.
+Currently, "ec2" and "digitalocean" are supported.
 
 After this playbook has run, a fully populated inventory file can be found
 in the location specified by EXT.ARCHITECTURE.cloud_inventory_dump_file. This
@@ -55,7 +55,7 @@ inventory file can be used to run the normal site.yml playbook against an
 existing, dynamically created cluster, in case you wish to re-visit a host
 or modify some settings in the already running instances.
 
-    $ ansible-playbook -i /var/tmp/cloud_inv -e "@vars/extra_vars.yml" site.yml
+    $ ansible-playbook -i /var/tmp/cloud_inv-465273546 -e "@vars/extra_vars.yml" site.yml
 
 For Amazon EC2:
     Please make sure that these environment variables are set:
@@ -65,6 +65,14 @@ For Amazon EC2:
 
     The values for those variables will be given to you when you create
     an Amazon EC2 account.
+
+For DigitalOcean:
+    You will have to have the ID of your SSH key, the ID of the image
+    and the ID of the size and region. Most of those things can only be
+    had from their API. See their documentation.
+
+    You will also need your client ID and API key. Those can be seen or
+    created on their web site.
 
 
 Modifications for your own projects
