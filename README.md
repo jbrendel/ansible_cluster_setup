@@ -124,7 +124,6 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Create local copy of dynamic inventory (for ongoing maintenance).
 - Better handling of Django settings files (use environment variables,
   rather than patching).
 - Make sure only running appservers are added to load balancing group.
