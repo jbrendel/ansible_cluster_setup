@@ -21,11 +21,16 @@ requirements_file:               local.txt
 pythonpath_dir:                  "{{ repo_dir }}/website"
 
 #
+# The application settings
+#
+appname:                         "{{ EXT.DJANGO.appname }}"
+
+#
 # For the Django environment
 #
 
 django_env:
-  DJANGO_SETTINGS_MODULE: "myapp.settings.deploy"
+  DJANGO_SETTINGS_MODULE: "{{ appname }}.settings.deploy"
   DJANGO_SECRET_KEY:      "{{ EXT.DJANGO.secret }}"
   DJANGO_DB_NAME:         "{{ myapp_db_name }}"
   DJANGO_DB_USER:         "{{ myapp_db_user_name }}"
@@ -34,5 +39,6 @@ django_env:
   DJANGO_SERVER_DNS:      "{{ EXT.DJANGO.dns }}"
   DJANGO_SERVER_SCHEMA:   "{{ EXT.DJANGO.schema }}"
   DJANGO_SERVER_PORT:     "{{ appserver_port }}"
+  DJANGO_TEST_DB:         "test_db_{{ inventory_hostname }}"
 
 

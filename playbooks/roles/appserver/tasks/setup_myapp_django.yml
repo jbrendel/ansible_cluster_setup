@@ -61,58 +61,6 @@
     state=directory
 
 #
-# There are separate settings files for test and deployment. I will have to
-# modify those files shortly in order to update them with the actual DB host IP
-# address. These files came with the source code. However, if I modify them
-# directly, right here, then the next time the playbook is run, the "hg" module
-# (used above) will notice that the sources have changed and I will
-# unnecessarily re-run some of the things below. Therefore, I will make copies
-# of those files first (which of course won't be under version control), will
-# update the copies and use the copies for the running of tests or the server.
-# Thus, the settings files that we checked out from the repository won't need
-# to be modified.
-#
-# Honestly, this is very 'hacky'. A much simpler solution would be to have
-# the db-host address taken from an environment variable, just like how the
-# DB user and password are taken from an environmen variable. That way, I
-# wouldn't have to modify those files at all.
-#
-- name: make copies of the settings files
-  command: >
-    cp
-    {{ repo_dir }}/website/myapp/settings/deploy.py
-    {{ repo_dir }}/website/myapp/settings/deploy2.py
-- command: >
-    cp
-    {{ repo_dir }}/website/myapp/settings/test.py
-    {{ repo_dir }}/website/myapp/settings/test2.py
-
-- name: setting the DB server in deployment settings
-  sudo_user: "{{ myapp_user_name }}"
-  lineinfile: >
-    dest={{ repo_dir }}/website/myapp/settings/deploy2.py
-    line="DATABASES['default']['HOST'] = '{{ db_host_addr }}'"
-
-- name: setting the DB server in test settings
-  sudo_user: "{{ myapp_user_name }}"
-  lineinfile: >
-    dest={{ repo_dir }}/website/myapp/settings/test2.py
-    line="DATABASES['default']['HOST'] = '{{ db_host_addr }}'"
-
-#
-# Multiple appserver hosts may run their unit tests at the same time. Since
-# they are all connected to the same database server they can't all just use
-# the same test-DB name. The "inventory_hostname" variable is the name of
-# the current host from the inventory. Therfore, on each host, we specify
-# a unique name for the test-DB by appending that host name to the DB-name.
-#
-- name: setting the test database name
-  sudo_user: "{{ myapp_user_name }}"
-  lineinfile: >
-    dest={{ repo_dir }}/website/myapp/settings/test2.py
-    line="DATABASES['default']['TEST_NAME'] = 'test_db_{{ inventory_hostname }}'"
-
-#
 # The database may need to be synced and migrated and fixtures need to be
 # loaded. However, that only needs to be (and only can be) done once. Therefore,
 # we make this action dependent ("when:") on the condition that we are the first
@@ -128,7 +76,7 @@
   sudo_user: "{{ myapp_user_name }}"
   shell: >
     "{{ install_dir }}/bin/python" manage.py syncdb
-    --migrate --noinput --settings=myapp.settings.deploy2
+    --migrate --noinput --settings={{ appname }}.settings.deploy
     executable=/bin/bash
     chdir={{ pythonpath_dir }}
   environment: django_env
@@ -141,7 +89,7 @@
 - name: compiling translated messages
   sudo_user: "{{ myapp_user_name }}"
   shell: >
-    "{{ install_dir }}/bin/python" manage.py compilemessages --settings=myapp.settings.deploy2
+    "{{ install_dir }}/bin/python" manage.py compilemessages --settings={{ appname }}.settings.deploy
     executable=/bin/bash
     chdir={{ pythonpath_dir }}
   environment: django_env
@@ -164,7 +112,7 @@
 - name: running unit tests
   sudo_user: "{{ myapp_user_name }}"
   shell: >
-    "{{ install_dir }}/bin/python" manage.py test utils --settings=myapp.settings.test2
+    "{{ install_dir }}/bin/python" manage.py test utils --settings={{ appname }}.settings.test
     executable=/bin/bash
     chdir={{ pythonpath_dir }}
   environment: django_env
@@ -203,7 +151,7 @@
   sudo_user: "{{ myapp_user_name }}"
   shell: >
     "{{ install_dir }}/bin/python" manage.py
-    runserver 0.0.0.0:{{ appserver_port }} --settings=myapp.settings.deploy2 >& /var/tmp/django_log.txt &
+    runserver 0.0.0.0:{{ appserver_port }} --settings={{ appname }}.settings.deploy >& /var/tmp/django_log.txt &
     executable=/bin/bash
     chdir={{ pythonpath_dir }}
   environment: django_env
