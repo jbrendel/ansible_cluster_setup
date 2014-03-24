@@ -124,8 +124,6 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Better handling of Django settings files (use environment variables,
-  rather than patching).
 - Make sure only running appservers are added to load balancing group.
 - Better, solid deployment of Django as re-starting service.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
