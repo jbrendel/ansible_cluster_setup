@@ -11,22 +11,38 @@ localhost ansible_connection=local
 
 [rackspace-hosts]
 
+#
+# Define groups for cluster formation
+#
+[cache]
+
 [frontend-hosts]
 
 [applayer-hosts]
 
 [backend-hosts]
 
+#
+# Group of hosts that need access to the database
+#
 [db-access:children]
 applayer-hosts
 backend-hosts
 
+#
+# Group of hosts that need access to the app server
+#
 [appserver-access:children]
 frontend-hosts
 applayer-hosts
 
-
-
-
+#
+# All the hosts that are in the cluster (not local and
+# not apt cache).
+#
+[cluster-hosts:children]
+applayer-hosts
+backend-hosts
+frontend-hosts
 
 

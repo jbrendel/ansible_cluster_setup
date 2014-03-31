@@ -26,6 +26,11 @@ pythonpath_dir:                  "{{ repo_dir }}/website"
 appname:                         "{{ EXT.DJANGO.appname }}"
 
 #
+# For testing
+#
+testapps:                        "{{ EXT.DJANGO.testapps }}"
+
+#
 # For the Django environment
 #
 

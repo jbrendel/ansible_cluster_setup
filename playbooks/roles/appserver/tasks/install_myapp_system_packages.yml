@@ -19,3 +19,7 @@
       - python-psycopg2
       - libpq-dev
 
+- name: install uwsgi
+  sudo: yes
+  pip: name=uwsgi state=present
+

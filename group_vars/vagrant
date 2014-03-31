@@ -4,3 +4,5 @@
 ---
 ansible_ssh_user:                vagrant
 
+eth_interface:                   ansible_eth1
+

@@ -6,6 +6,6 @@
 myapp_db_user_name:             "{{ EXT.DATABASE.db_user }}"
 myapp_db_user_password:         "{{ EXT.DATABASE.db_password }}"
 myapp_db_name:                  "{{ EXT.DATABASE.db_name }}"
-db_host_addr:                   "{{ hostvars[groups['backend-hosts'][0]]['ansible_eth0']['ipv4']['address'] }}"
+db_host_addr:                   "{{ hostvars[groups['backend-hosts'][0]][eth_interface]['ipv4']['address'] }}"
 
 

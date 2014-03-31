@@ -1,0 +1,11 @@
+#
+# Variables for all hosts
+#
+---
+eth_interface:                   ansible_eth0
+
+cache:
+    apt_cache_port:              3142
+    pkg_cache:                   "{{ EXT.CACHE.pkg_cache }}"
+    pkg_cache_existing_ip_addr:  "{{ EXT.CACHE.pkg_cache_existing_ip_addr }}"
+

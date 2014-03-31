@@ -43,7 +43,7 @@
 - name: adding access permissions for app server hosts
   lineinfile: >
       dest=/etc/postgresql/9.1/main/pg_hba.conf
-      line="host all all {{ hostvars[item]['ansible_eth0']['ipv4']['address'] }}/24 md5"
+      line="host all all {{ hostvars[item][eth_interface]['ipv4']['address'] }}/24 md5"
   with_items: groups['applayer-hosts']
   notify:
       - restart db server
@@ -58,7 +58,7 @@
 - name: let db server listen on its internal interface
   lineinfile: >
       dest=/etc/postgresql/9.1/main/postgresql.conf
-      line="listen_addresses='{{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}'"
+      line="listen_addresses='{{ hostvars[inventory_hostname][eth_interface]['ipv4']['address'] }}'"
   notify:
       - restart db server
 

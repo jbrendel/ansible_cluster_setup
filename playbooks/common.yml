@@ -4,8 +4,9 @@
 
 ---
 
+
 - name: basic configs on all servers
-  hosts: frontend-hosts:applayer-hosts:backend-hosts
+  hosts: cluster-hosts
   sudo: yes
   roles:
     - common

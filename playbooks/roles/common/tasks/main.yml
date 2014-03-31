@@ -6,6 +6,10 @@
 
 ---
 
+- name: set local proxy config
+  template: src=01proxy.js dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644
+  when: cache.pkg_cache == "create"  or  cache.pkg_cache == "use"
+
 - name: updating the system
   apt: update_cache=yes cache_valid_time=86400
   notify:

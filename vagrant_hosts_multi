@@ -1,0 +1,45 @@
+#
+# An inventory file for Vagrant driven local environments.
+# To reduce the load on the local machine, we only define
+# two hosts. The apt-cache, load-balancer and database
+# are all located on the same host.
+#
+
+[vagrant]
+app-host-1        ansible_ssh_host=192.168.88.11
+app-host-2        ansible_ssh_host=192.168.88.22
+web-db-host       ansible_ssh_host=192.168.88.44
+cache-host        ansible_ssh_host=192.168.99.99
+
+
+[cache]
+cache-host
+
+[frontend-hosts]
+web-db-host
+
+[applayer-hosts]
+app-host-1
+app-host-2
+
+[backend-hosts]
+web-db-host
+
+
+[db-access:children]
+applayer-hosts
+backend-hosts
+
+[appserver-access:children]
+frontend-hosts
+applayer-hosts
+
+#
+# All the hosts that are in the cluster (not local and
+# not apt cache).
+#
+[cluster-hosts:children]
+applayer-hosts
+backend-hosts
+frontend-hosts
+

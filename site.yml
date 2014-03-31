@@ -4,6 +4,28 @@
 
 ---
 
+#
+# Set up the apt cache server.
+#
+- include: playbooks/cacher.yml
+
+#
+# The cache server may have been rebooted. Therefore, we need to wait
+# until it is up before we do anything else.
+#
+- hosts: cluster-hosts
+  gather_facts: False
+  tasks:
+    - name: wait for apt cache server port to be operational (new cache)
+      wait_for: host={{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }} port={{ cache.apt_cache_port }}
+      when: cache.pkg_cache == "create"
+    - name: wait for apt cache server port to be operational (existing cache)
+      wait_for: host={{ cache.pkg_cache_existing_ip_addr }} port={{ cache.apt_cache_port }}
+      when: cache.pkg_cache == "use"
+
+#
+# Functional setup of cluster servers.
+#
 - include: playbooks/common.yml
 - include: playbooks/backend.yml
 - include: playbooks/applayer.yml

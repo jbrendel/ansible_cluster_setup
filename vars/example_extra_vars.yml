@@ -25,6 +25,10 @@ EXT:
         cloud_inventory_dump_file:  "/var/tmp/cloud_inv"   # Dynamically generated inventory is dumped here 
                                                            # (random number will be added to filename).
 
+    CACHE:
+        pkg_cache:                    "create"    # "create" or "use" or "none"
+        pkg_cache_existing_ip_addr:   ""          # IP address of cache server, or leave blank if "create" or "none"
+
     REPO:
         host:           "bitbucket.org"
         url:            "ssh://hg@bitbucket.org/......."   # complete the repository URL
@@ -34,6 +38,8 @@ EXT:
         secret:         "....."                            # the Django secret
         schema:         "http://"
         dns:            "www.example.com"                  # the domain name for the Django server
+        appname:        "myapp"                            # name of the Django app/project
+        testapps:       "app1 app2 app2"                   # space-separated list of all apps to unit-test
 
     USERS:
         deploy_user:    "myapp"                            # user account created on host, running the appserver

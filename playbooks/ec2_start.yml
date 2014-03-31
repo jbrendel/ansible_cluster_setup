@@ -28,9 +28,13 @@
     #
     - name: launch ec2 instances
       local_action: >
-        ec2 key_name={{ ec2_key_name }} group={{ ec2_security_group }}
-            instance_type={{ ec2_instance_type }} image={{ ec2_image }}
-            wait=true region={{ ec2_region }} count={{ ec2_instance_count }}
+        ec2 key_name={{ EXT.EC2.regions_settings[EXT.EC2.region].ssh_key_name }}
+            group={{ EXT.EC2.regions_settings[EXT.EC2.region].security_group }}
+            instance_type={{ EXT.EC2.instance_type }}
+            image={{ EXT.EC2.regions_settings[EXT.EC2.region].image }}
+            region={{ EXT.EC2.region }}
+            count={{ EXT.ARCHITECTURE.num_hosts }}
+            wait=true
       register: ec2results
 
     #
@@ -66,7 +70,17 @@
                  groupname=backend-hosts
 
     #
+    # We also make the second one our apt-cache host.
+    #
+    - name: add new instances to cache group
+      local_action: >
+        add_host hostname={{ ec2results.instances[1].public_ip }}
+                 groupname=cache
+      when: cache.pkg_cache == "create"
+
+    #
     # All the remaining hosts are added to the applayer host group.
+    #
     - name: add new instances to applayer group
       local_action: >
         add_host hostname={{ item.public_ip }}

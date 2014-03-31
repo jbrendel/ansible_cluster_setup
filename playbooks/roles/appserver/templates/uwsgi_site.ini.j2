@@ -1,0 +1,18 @@
+[uwsgi]
+master     = true
+processes  = 2
+chdir      = {{ pythonpath_dir }}
+; **** the 'module' is the wsgi.py file for the project
+module     = wsgi
+home       = {{ install_dir }}
+http       = 0.0.0.0:{{ appserver_port }}
+logto      = /var/tmp/uwsgi.log
+no-site    = true
+
+pythonpath = {{ pythonpath_dir }}
+pythonpath = {{ install_dir }}/lib/python2.7
+pythonpath = {{ install_dir }}/local/lib/python2.7/site-packages
+pythonpath = /usr/lib/python2.7
+
+
+

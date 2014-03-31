@@ -1,6 +1,6 @@
 upstream {{ ansible_ssh_host }}  {
 {% for host in groups['applayer-hosts'] %}
-   server {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}:{{ appserver_port }} ;
+   server {{ hostvars[host][eth_interface]['ipv4']['address'] }}:{{ appserver_port }} ;
 {% endfor %}
 }
 

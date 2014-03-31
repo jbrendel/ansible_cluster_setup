@@ -1,0 +1,13 @@
+#
+# For the caching server
+#
+
+---
+
+- name: configuring the apt-cacher
+  hosts: cache
+  sudo: yes
+
+  roles:
+    - { role: cacher, when: cache.pkg_cache == "create" }
+

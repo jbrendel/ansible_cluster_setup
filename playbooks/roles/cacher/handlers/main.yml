@@ -5,5 +5,5 @@
 ---
 
 - name: restart server
-  command: /sbin/reboot -t now
+  command: /sbin/reboot
 

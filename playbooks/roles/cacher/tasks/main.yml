@@ -1,0 +1,54 @@
+#
+# Perform a system and install apt-cacher.
+#
+
+---
+
+- name: updating the system
+  apt: update_cache=yes
+
+- name: installing cacher
+  apt: pkg={{ item }} state=present
+  with_items:
+    - apt-cacher
+    #- apache2
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+- name: setup cacher configuration
+  lineinfile:
+    dest:   /etc/default/apt-cacher
+    line:   "AUTOSTART=1"
+
+- name: new apt-cacher config file
+  copy:
+    src:    apt-cacher.conf
+    dest:   /etc/apt-cacher/apt-cacher.conf
+    owner:  root
+    group:  root
+    mode:   644
+    backup: yes
+
+#- name: restart apache
+#  service: name=apache2 state=restarted
+
+- name: restart apt-cacher
+  service: name=apt-cacher state=restarted
+
+- name: import existing packages
+  shell: /usr/share/apt-cacher/apt-cacher-import.pl -l /var/cache/apt/archives
+
+- name: set local proxy config
+  template: src=01proxy.js dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644
+
+- name: reinstalling the language pack
+  command: apt-get -y install --reinstall language-pack-en
+
+- name: updating the system
+  apt: update_cache=yes cache_valid_time=86400
+  notify: restart server
+
+- name: upgrading the system
+  apt: upgrade=dist
+  notify: restart server
+

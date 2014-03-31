@@ -34,7 +34,7 @@ in the cluster. This is really useful to easily setup new test clusters, or to
 show customers what you're working on, etc., or maybe even for the actual
 deployment cluster.
 
-Currently, we are supporting only Amazon EC2, but support for other providers
+Currently, we are Amazon EC2 and DitalOcean, but support for other providers
 is already planned.
 
 
@@ -98,16 +98,34 @@ the following settings and files:
         - The running of the unit tests.
         - The running of the Django server.
 
+
+Repository cache
+----------------
+When deploying larger clusters, it can be benefitial to utilize a repository
+cache, for example an "apt cache". See the "CACHE" secion in the extra_vars.yml
+file. If you set "pkg_cache" to "create", one of the cluster hosts will be
+designated as the cache server and utilized by all the other hosts in the
+cluster. If you already have an existing cache server, you can set pkg_cache
+to "use" and specify the IP address of the cache server with the variable
+"pkg_cache_existing_ip_addr".
+
+
 Vagrant
 -------
 There is also a Vgrantfile if you wish to start VMs locally for testing or
-development. It uses the vagrant_hosts inventory file. As you can see in that
-inventory file, the same host appears in all groups. That's ok, Ansible can
-wire it all up anyway, whether the various components run on different hosts
-or on the same host.
+development. It uses the vagrant_hosts inventory file.
 
 With that Vagrantfile in place, just do "$ vagrant up" and you'll be in
 business.
+
+If you choose to create a cache host and re-use this cache host for different
+"vagrant up" runs, you should use the "provision" command: The Ansible
+provisioner runs as part of the cache host bring-up. If it's up already, it
+the provisioning step wouldn't execute. Thus, the need to force it with the
+"provision" command after the "up" command:
+
+    $ vagrant up
+    $ vargant provision
 
 
 Closing comments
@@ -124,8 +142,9 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Make sure only running appservers are added to load balancing group.
 - Better, solid deployment of Django as re-starting service.
+- Provide a cluster shutdown / halt playbook.
+- Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
 - Setup database cluster with failover, if possible.
 - Extend Vagrantfile (or offer second version) that brings up multiple
