@@ -12,6 +12,10 @@
 #
 
 EXT:
+    #
+    # When deploying via Vagrant, the ARCHITECTURE section can be
+    # commented out or removed.
+    #
     ARCHITECTURE:
         cloud_provider: "ec2"                              # One of the supported providers, currently
                                                            # "ec2" and "digitalocean". Each of those
@@ -25,15 +29,34 @@ EXT:
         cloud_inventory_dump_file:  "/var/tmp/cloud_inv"   # Dynamically generated inventory is dumped here 
                                                            # (random number will be added to filename).
 
+    #
+    # The cache machine is used as APT as well as PIP cache. If 'create' is
+    # specified and a cloud provider is used for automatic provisioning of
+    # hosts then one of the hosts also serves as cache. If Vagrant is used
+    # then an extra host is created for cache purposes. It's useful to have
+    # an extra host in that case, since you can easily re-use it for other
+    # projects as well.
+    #
+    # To use an existing cache host, specify 'use' as the value for pkg_cache
+    # and specify the cache's IP address in pkg_cache_existing_ip_addr.
+    #
     CACHE:
         pkg_cache:                    "create"    # "create" or "use" or "none"
-        pkg_cache_existing_ip_addr:   ""          # IP address of cache server, or leave blank if "create" or "none"
+        pkg_cache_existing_ip_addr:   ""          # IP address of cache server, ignored (leave blank) if "create" or "none"
 
+    #
+    # Specifications needed to access the repository for your source code.
+    # This currently assumes that an SSH key (the deployment key) is needed
+    # for access.
+    #
     REPO:
         host:           "bitbucket.org"
         url:            "ssh://hg@bitbucket.org/......."   # complete the repository URL
         deployment_key: "/home/localuser/..."              # path to the deployment key file
 
+    #
+    # Some specifications needed for the Django application.
+    #
     DJANGO:
         secret:         "....."                            # the Django secret
         schema:         "http://"
@@ -41,10 +64,16 @@ EXT:
         appname:        "myapp"                            # name of the Django app/project
         testapps:       "app1 app2 app2"                   # space-separated list of all apps to unit-test
 
+    #
+    # Users for the appserver.
+    #
     USERS:
         deploy_user:    "myapp"                            # user account created on host, running the appserver
         deploy_group:   "myapp-users"                      # group for that account
 
+    #
+    # Database specifications and parameters.
+    #
     DATABASE:
         db_user:        "myapp_db_user"                    # the database user
         db_password:    "super secret password"            # the database password

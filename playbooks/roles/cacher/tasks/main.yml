@@ -7,11 +7,15 @@
 - name: updating the system
   apt: update_cache=yes
 
+#
+# Installing the apt cache
+#
+
 - name: installing cacher
   apt: pkg={{ item }} state=present
   with_items:
     - apt-cacher
-    #- apache2
+    - python-pip
   environment:
     DEBIAN_FRONTEND: noninteractive
 
@@ -39,7 +43,7 @@
   shell: /usr/share/apt-cacher/apt-cacher-import.pl -l /var/cache/apt/archives
 
 - name: set local proxy config
-  template: src=01proxy.js dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644
+  template: src=01proxy.j2 dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644
 
 - name: reinstalling the language pack
   command: apt-get -y install --reinstall language-pack-en
@@ -51,4 +55,31 @@
 - name: upgrading the system
   apt: upgrade=dist
   notify: restart server
+
+#
+# Installing the PIP cache
+#
+
+- name: install devpi PIP cache
+  pip: name=devpi-server
+
+- name: install service script
+  template: src=devpi.j2 dest=/etc/init.d/devpi owner=root group=root mode=766
+
+- name: start the devpi service
+  service: name=devpi state=restarted
+
+#
+# We should install devpi as a system process, so that it starts
+# during system reboot (in /etc/rcX.d/...). However, for some reason
+# that doesn't work, the process tries to start, but immediately fails
+# and finally is given up on (messages in /var/log/dmesg). Therefore,
+# we use the less ideal approach and start the service once a minute
+# via cron.
+#
+# If the system process problem could be solved, we should switch
+# to that approach.
+#
+- name: install cronjob for restarts
+  cron: name="devpi" job="service devpi start > /dev/null"
 

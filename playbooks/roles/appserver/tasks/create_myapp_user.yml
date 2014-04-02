@@ -4,15 +4,24 @@
 
 ---
 
-- name: Create {{ myapp_group_name }} group...
+- name: create {{ myapp_group_name }} group...
   group: name={{ myapp_group_name }} state=present
 
-- name: Create {{ myapp_user_name }} user...
+- name: create {{ myapp_user_name }} user...
   user: >
     name={{ myapp_user_name }}
     state=present
     groups={{ myapp_group_name }}
     shell=/bin/bash
+
+- name: write PIP cache config
+  file: path=/home/{{ myapp_user_name }}/.pip state=directory 
+  when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
+- template: >
+        src=pip.conf.j2
+        dest=/home/{{ myapp_user_name }}/.pip/pip.conf
+        owner={{ myapp_user_name }} group={{ myapp_group_name }} group=root mode=644
+  when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
 
 #
 # We check for the presence of the deployment key to see if we have to go through the

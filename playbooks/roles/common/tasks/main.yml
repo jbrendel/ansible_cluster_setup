@@ -7,8 +7,17 @@
 ---
 
 - name: set local proxy config
-  template: src=01proxy.js dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644
+  template: src=01proxy.j2 dest=/etc/apt/apt.conf.d/01proxy owner=root group=root mode=644
   when: cache.pkg_cache == "create"  or  cache.pkg_cache == "use"
+
+- name: write PIP cache config for root
+  file: path=/root/.pip state=directory 
+  when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
+- template: >
+        src=pip.conf.j2
+        dest=/root/.pip/pip.conf
+        owner=root group=root group=root mode=644
+  when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
 
 - name: updating the system
   apt: update_cache=yes cache_valid_time=86400

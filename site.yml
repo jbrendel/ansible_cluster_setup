@@ -22,6 +22,12 @@
     - name: wait for apt cache server port to be operational (existing cache)
       wait_for: host={{ cache.pkg_cache_existing_ip_addr }} port={{ cache.apt_cache_port }}
       when: cache.pkg_cache == "use"
+    - name: wait for PIP cache server port to be operational (new cache)
+      wait_for: host={{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }} port={{ cache.pip_cache_port }}
+      when: cache.pkg_cache == "create"
+    - name: wait for PIP cache server port to be operational (existing cache)
+      wait_for: host={{ cache.pkg_cache_existing_ip_addr }} port={{ cache.pip_cache_port }}
+      when: cache.pkg_cache == "use"
 
 #
 # Functional setup of cluster servers.

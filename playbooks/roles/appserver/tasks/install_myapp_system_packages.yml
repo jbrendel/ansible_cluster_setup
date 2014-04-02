@@ -21,5 +21,7 @@
 
 - name: install uwsgi
   sudo: yes
-  pip: name=uwsgi state=present
+  pip: >
+    name=uwsgi
+    state=present
 

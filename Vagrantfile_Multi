@@ -42,5 +42,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             ansible.host_key_checking = false
         end
     end
+
+    #
+    # Adding a little more memory
+    #
+    config.vm.provider "virtualbox" do |v|
+      v.memory = 1024
+      v.cpus = 2
+    end
+
 end
 

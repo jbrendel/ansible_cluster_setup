@@ -1,0 +1,7 @@
+[global]
+{% if cache.pkg_cache == "create" %}
+index-url = http://{{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }}:{{ cache.pip_cache_port }}/root/pypi/+simple/
+{% else %}
+index-url = http://{{ cache.pkg_cache_existing_ip_addr }}:{{ cache.pip_cache_port }}/root/pypi/+simple/
+{% endif %}
+
