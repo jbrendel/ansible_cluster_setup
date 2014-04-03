@@ -6,26 +6,19 @@
 #
 
 [vagrant]
-app-host-1        ansible_ssh_host=192.168.88.11
-#app-host-2        ansible_ssh_host=192.168.88.22
-#web-db-host       ansible_ssh_host=192.168.88.44
-cache-host        ansible_ssh_host=192.168.99.99
-
+host-1            ansible_ssh_host=192.168.88.99
 
 [cache]
-cache-host
+host-1
 
 [frontend-hosts]
-app-host-1
-#web-db-host
+host-1
 
 [applayer-hosts]
-app-host-1
-#app-host-2
+host-1
 
 [backend-hosts]
-app-host-1
-#web-db-host
+host-1
 
 
 [db-access:children]

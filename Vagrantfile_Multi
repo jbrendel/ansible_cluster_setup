@@ -2,8 +2,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     servers = { :"app-host-1"       => '192.168.88.11',
-                :"app-host-2"       => '192.168.88.22',
-                :"web-db-host"      => '192.168.88.44',
+                #:"app-host-2"       => '192.168.88.22',
+                #:"web-db-host"      => '192.168.88.44',
               }
     last_host_name = "cache-host"
     last_host_ip   = "192.168.99.99"

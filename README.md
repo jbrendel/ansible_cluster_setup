@@ -152,7 +152,6 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Better, solid deployment of Django as re-starting service.
 - Provide a cluster shutdown / halt playbook.
 - Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.

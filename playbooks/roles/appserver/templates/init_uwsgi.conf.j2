@@ -1,0 +1,25 @@
+# uWSGI upstart script
+
+description "uwsgi server"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+env PYTHONPATH={{ pythonpath_dir }}
+env DJANGO_SETTINGS_MODULE='{{ django_env.DJANGO_SETTINGS_MODULE }}'
+env DJANGO_SECRET_KEY='{{ django_env.DJANGO_SECRET_KEY }}'
+env DJANGO_DB_PASSWORD='{{ django_env.DJANGO_DB_PASSWORD }}'
+env DJANGO_DB_NAME='{{ django_env.DJANGO_DB_NAME }}'
+env DJANGO_DB_USER='{{ django_env.DJANGO_DB_USER }}'
+env DJANGO_SERVER_DNS='{{ django_env.DJANGO_SERVER_DNS }}'
+env DJANGO_SERVER_PORT='{{ appserver_port }}'
+env DJANGO_SERVER_SCHEMA='{{ django_env.DJANGO_SERVER_SCHEMA }}'
+env DJANGO_DB_HOST='{{ django_env.DJANGO_DB_HOST }}'
+env DJANGO_TEST_DB='{{ django_env.DJANGO_TEST_DB }}'
+
+
+respawn
+chdir {{ install_dir }}
+exec uwsgi --uid {{ myapp_user_name }} --emperor uwsgi_conf/
+
+

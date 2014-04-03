@@ -6,7 +6,7 @@ chdir      = {{ pythonpath_dir }}
 module     = wsgi
 home       = {{ install_dir }}
 http       = 0.0.0.0:{{ appserver_port }}
-logto      = /var/tmp/uwsgi.log
+logto      = /var/log/uwsgi/uwsgi.log
 no-site    = true
 
 pythonpath = {{ pythonpath_dir }}
@@ -14,5 +14,7 @@ pythonpath = {{ install_dir }}/lib/python2.7
 pythonpath = {{ install_dir }}/local/lib/python2.7/site-packages
 pythonpath = /usr/lib/python2.7
 
+check-static = {{ pythonpath_dir }}/STATIC_ROOT/
 
+log-format = %(tmsecs) [%(ltime)] - %(addr) - "%(method) %(uri) %(proto)" %(status) %(size) "%(referer)" "%(uagent)"
 

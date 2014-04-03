@@ -118,22 +118,16 @@
   environment: django_env
   when: source_version.changed
 
-#
-# Don't look at this here too closely: You shouldn't run a production Django
-# server like this. I'm basically just stopping any currently running servers
-# and then run the plain Django built-in server. In reality, you would make
-# sure it's in some sort of re-starting process, gets run after reboot, etc.
-# So, these next two steps definitely need to be replaced with something more
-# solid.
-#
 
-- name: create uwsgi emperor directory
-  sudo_user: "{{ myapp_user_name }}"
-  file: >
-    path={{ install_dir }}/uwsgi_conf
-    group={{ myapp_user_name }}
-    state=directory
-
+#
+# Running the Django server via uWSGI.
+#
+# We don't want to server static files via Django, so all static files are
+# collected and uWSGI is instructed to server them from there.
+#
+# uWSGI itself will be run via upstart, so that it is automatically started
+# when the server reboots and is restarted in case it crashes.
+#
 - name: collecting static files
   sudo_user: "{{ myapp_user_name }}"
   shell: >
@@ -142,45 +136,28 @@
     chdir={{ pythonpath_dir }}
   environment: django_env
 
+- name: create directory for uwsgi logs
+  sudo: yes
+  file: >
+    path=/var/log/uwsgi owner={{ myapp_user_name }}
+    group={{ myapp_user_name }}
+    state=directory
+
+- name: create uwsgi emperor directory
+  sudo_user: "{{ myapp_user_name }}"
+  file: >
+    path={{ install_dir }}/uwsgi_conf
+    group={{ myapp_user_name }}
+    state=directory
+
 - name: create uwsgi conf
   sudo_user: "{{ myapp_user_name }}"
   template: src=uwsgi_site.ini.j2 dest={{ install_dir }}/uwsgi_conf/uwsgi_site.ini
 
-- name: start uwsgi for django project
-  sudo_user: "{{ myapp_user_name }}"
-  shell: uwsgi --emperor {{ install_dir }}/uwsgi_conf
-  environment: django_env
-  async: 10
-  poll: 0
+- name: create uwsgi init file
+  sudo: yes
+  template: src=init_uwsgi.conf.j2 dest=/etc/init/uwsgi.conf
 
-#
-# Killing any existing Django server processes. Note the "ignore_errors"
-# directive.  That's because pkill will return an error if it didn't find
-# anything to kill. But that is of course not a problem for us, so we want to
-# ignore such an error.
-#
-#- name: stopping django server
-#  sudo_user: "{{ myapp_user_name }}"
-#  command: pkill -f manage.py
-#  ignore_errors: True
-
-#
-# Starting the Django server. Note the "async" and "poll" at the end.
-# Basically, we don't want Ansible to wait for the completion of this process.
-# We tell it to start it asynchronously, wait for some maximum time (10
-# seconds) and during that time poll for the status of the process every "poll"
-# seconds. However, by specifiying "0" for the poll interval, we are telling
-# Ansible to never poll at all. Therefore, this little hack allows us to start
-# a "fire and forget" process/task in the background while Ansible moves on.
-#
-#- name: starting django server
-#  sudo_user: "{{ myapp_user_name }}"
-#  shell: >
-#    "{{ install_dir }}/bin/python" manage.py
-#    runserver 0.0.0.0:{{ appserver_port }} --settings={{ appname }}.settings.deploy >& /var/tmp/django_log.txt &
-#    executable=/bin/bash
-#    chdir={{ pythonpath_dir }}
-#  environment: django_env
-#  async: 10
-  poll: 0
+- name: starting uWSGI/Django server process
+  service: name=uwsgi state=started
 
