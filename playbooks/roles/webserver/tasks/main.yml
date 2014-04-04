@@ -16,8 +16,12 @@
 # hosts into another dynamic group and then here in the template iterate over
 # that dynamically created group instead.
 #
-- name: set the nginx config file
+- name: create nginx config file for the site
   template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default
   notify:
     - restart nginx
+
+- name: add nginx config
+  copy: src=nginx_uwsgi.conf dest=/etc/nginx/conf.d/uwsgi.conf
+
 

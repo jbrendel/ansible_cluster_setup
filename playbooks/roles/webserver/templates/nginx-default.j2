@@ -1,15 +1,37 @@
-upstream {{ ansible_ssh_host }}  {
+upstream app_server_pool  {
 {% for host in groups['applayer-hosts'] %}
    server {{ hostvars[host][eth_interface]['ipv4']['address'] }}:{{ appserver_port }} ;
 {% endfor %}
 }
 
 server {
-  listen 80;
+    listen 80;
 
-  location / {
-    proxy_pass  http://{{ ansible_ssh_host }};
-  }
+    location / {
+        uwsgi_pass app_server_pool;
+        uwsgi_param QUERY_STRING $query_string;
+        uwsgi_param REQUEST_METHOD $request_method;
+        uwsgi_param CONTENT_TYPE $content_type;
+        uwsgi_param CONTENT_LENGTH $content_length;
+        uwsgi_param REQUEST_URI $request_uri;
+        uwsgi_param PATH_INFO $document_uri;
+        uwsgi_param DOCUMENT_ROOT $document_root;
+        uwsgi_param SERVER_PROTOCOL $server_protocol;
+        uwsgi_param REMOTE_ADDR $remote_addr;
+        uwsgi_param REMOTE_PORT $remote_port;
+        uwsgi_param SERVER_ADDR $server_addr;
+        uwsgi_param SERVER_PORT $server_port;
+        uwsgi_param SERVER_NAME $server_name;
+
+        uwsgi_cache           CACHE_NAME;
+        uwsgi_cache_key       $host$request_uri;
+        uwsgi_cache_valid     200 302  1h;
+        uwsgi_cache_valid     301      1d;
+        uwsgi_cache_valid     any      1m;
+        uwsgi_cache_min_uses  1;
+        uwsgi_cache_use_stale error  timeout invalid_header http_500;
+
+    }
 
 }
 

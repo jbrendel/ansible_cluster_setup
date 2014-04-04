@@ -5,7 +5,7 @@ chdir      = {{ pythonpath_dir }}
 ; **** the 'module' is the wsgi.py file for the project
 module     = wsgi
 home       = {{ install_dir }}
-http       = 0.0.0.0:{{ appserver_port }}
+socket     = {{ hostvars[inventory_hostname][eth_interface]['ipv4']['address'] }}:{{ appserver_port }}
 logto      = /var/log/uwsgi/uwsgi.log
 no-site    = true
 
