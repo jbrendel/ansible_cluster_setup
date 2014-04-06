@@ -4,6 +4,10 @@
 
 ---
 
+- name: disable mlocate runs
+  command: chmod -x /etc/cron.daily/mlocate
+  ignore_errors: yes
+
 - name: updating the system
   apt: update_cache=yes
 
