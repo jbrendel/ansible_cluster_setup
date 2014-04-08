@@ -12,6 +12,9 @@
 #
 
 EXT:
+    PURPOSE:                        "deploy"   # or "deploy". If "testrun", all instances will be shutdown
+                                               # and terminated at the end (if this is a cloud-based deployment)
+
     #
     # When deploying via Vagrant, the ARCHITECTURE section can be
     # commented out or removed.

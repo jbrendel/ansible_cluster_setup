@@ -17,6 +17,7 @@
 - name: write PIP cache config for root
   file: path=/root/.pip state=directory 
   when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
+
 - template: >
         src=pip.conf.j2
         dest=/root/.pip/pip.conf

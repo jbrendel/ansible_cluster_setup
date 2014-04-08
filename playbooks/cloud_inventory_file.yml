@@ -6,7 +6,7 @@
 # against a cluster.
 #
 # This assumes that the 'timestamp' variable was registered in the
-# *_start.yml playbook.
+# start_*.yml playbook.
 #
 
 ---

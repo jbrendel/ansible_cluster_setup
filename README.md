@@ -81,6 +81,15 @@ For DigitalOcean:
     on their web site.
 
 
+Testruns in cloud environments
+------------------------------
+If the only purpose of the cluster is to run tests, it is not necessary to keep
+the running instances around after a successful completion. In that case, fund
+the EXT.PURPOSE parameter and set it to "testrun". In that case, the cluster
+is deployed and if all tests run successfully, the cluster nodes will be terminated
+right away.
+
+
 Modifications for your own projects
 -----------------------------------
 If you wish to use this for your own projects, you will need to modify
@@ -152,7 +161,6 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Provide a cluster shutdown / halt playbook.
 - Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
 - Setup database cluster with failover, if possible.

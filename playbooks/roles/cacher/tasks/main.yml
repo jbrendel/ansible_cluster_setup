@@ -29,8 +29,8 @@
     line:   "AUTOSTART=1"
 
 - name: new apt-cacher config file
-  copy:
-    src:    apt-cacher.conf
+  template:
+    src:    apt-cacher.conf.j2
     dest:   /etc/apt-cacher/apt-cacher.conf
     owner:  root
     group:  root

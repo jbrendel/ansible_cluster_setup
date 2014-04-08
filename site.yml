@@ -11,9 +11,12 @@
 
 #
 # The cache server may have been rebooted. Therefore, we need to wait
-# until it is up before we do anything else.
+# until it is up before we do anything else. We wait from the cluster
+# hosts (since we might use private IP addresses), rather than from
+# localhost. Therefore, we must make sure to exclude the cache machine
+# itself, since that one is probably not done rebooting at this point.
 #
-- hosts: cluster-hosts
+- hosts: cluster-hosts:!cache
   gather_facts: False
   tasks:
     - name: wait for apt cache server port to be operational (new cache)

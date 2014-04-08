@@ -8,8 +8,10 @@
         msg="@@@@@ Cluster creation completed.
              ID: {{ timestamp.stdout }}
              Inventory File: {{ EXT.ARCHITECTURE.cloud_inventory_dump_file }}-{{ timestamp.stdout }}"
+      when: EXT.PURPOSE != "testrun"
 
     - debug: >
         msg="@@@@@ To re-run provisioning on same hosts:
              $ ansible-playbook -i {{ EXT.ARCHITECTURE.cloud_inventory_dump_file }}-{{ timestamp.stdout }} -e @vars/your_extra_vars.yml site.yml"
+      when: EXT.PURPOSE != "testrun"
 

@@ -1,0 +1,17 @@
+---
+
+- name: shutdown the cluster if so desired
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: shutting down all EC2 instances
+      local_action: >
+        digital_ocean state=deleted command=droplet id={{ item.droplet.id }}
+                      client_id={{ EXT.DIGITALOCEAN.client_id }}
+                      api_key={{ EXT.DIGITALOCEAN.api_key }}
+      with_items: droplet_instances.results
+      when: EXT.PURPOSE == "testrun"
+
+    - debug: msg="@@@@@ Termination of all DigitalOcean cluster nodes completed, after successful run."
+      when: EXT.PURPOSE == "testrun"
+

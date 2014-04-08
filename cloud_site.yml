@@ -4,10 +4,11 @@
 
 ---
 
-- include: playbooks/{{ EXT.ARCHITECTURE.cloud_provider }}_start.yml
+- include: playbooks/start_{{ EXT.ARCHITECTURE.cloud_provider }}.yml
 - include: playbooks/cloud_inventory_file.yml
 
 - include: site.yml
 
 - include: playbooks/print_message.yml
+- include: playbooks/cluster_shutdown_{{ EXT.ARCHITECTURE.cloud_provider }}.yml
 

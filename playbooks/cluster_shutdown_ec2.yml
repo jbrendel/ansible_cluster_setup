@@ -1,0 +1,17 @@
+---
+
+- name: shutdown the cluster if so desired
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: shutting down all EC2 instances
+      local_action:
+        module: ec2
+        state: 'absent'
+        region: '{{ EXT.EC2.region }}'
+        instance_ids: '{{ ec2results.instance_ids }}'
+      when: EXT.PURPOSE == "testrun"
+
+    - debug: msg="@@@@@ Termination of all EC2 cluster nodes completed, after successful run."
+      when: EXT.PURPOSE == "testrun"
+
