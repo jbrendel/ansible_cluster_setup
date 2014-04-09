@@ -32,3 +32,7 @@
 - name: reinstalling the language pack
   command: apt-get -y install --reinstall language-pack-en
 
+- name: installing ferm firewall tool
+  apt: pkg=ferm state=present
+
+

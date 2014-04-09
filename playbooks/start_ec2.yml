@@ -35,6 +35,7 @@
             region={{ EXT.EC2.region }}
             count={{ EXT.ARCHITECTURE.num_hosts }}
             wait=true
+            instance_tags='{ "cluster_id" : {{ timestamp.stdout }} }'
       register: ec2results
 
     #
