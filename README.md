@@ -90,6 +90,28 @@ is deployed and if all tests run successfully, the cluster nodes will be termina
 right away.
 
 
+Security
+--------
+For added security, iptables will be configured as a restrictive firewall, using
+the 'ferm' utility. In general, the following ports for incoming connections are
+opened:
+
+    Protocol        From             Configured on          Notes
+    ---------------------------------------------------------------------------
+    SSH             public           all hosts
+    ICMP echo       public           all hosts
+    80, 443         public           frontend hosts
+    3142, 3143      cluster hosts    apt/pip cache host     Cache access ports
+    5432            applayer hosts   backend hosts          postgres port
+    8091            frontend hosts   applayer hosts         uwsgi port
+
+All other incoming packets/connections will be dropped. Outgoing connections
+are not restricted at this point.
+
+If you need to open other ports for other services, please make sure to edit
+the ferm.conf.j2 template file accordingly.
+
+
 Modifications for your own projects
 -----------------------------------
 If you wish to use this for your own projects, you will need to modify
@@ -161,7 +183,6 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Configure IP tables.
 - Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
 - Setup database cluster with failover, if possible.

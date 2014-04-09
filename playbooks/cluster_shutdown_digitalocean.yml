@@ -4,7 +4,7 @@
   hosts: localhost
   gather_facts: False
   tasks:
-    - name: shutting down all EC2 instances
+    - name: shutting down all DigitalOcean instances
       local_action: >
         digital_ocean state=deleted command=droplet id={{ item.droplet.id }}
                       client_id={{ EXT.DIGITALOCEAN.client_id }}
