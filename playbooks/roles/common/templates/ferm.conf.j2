@@ -1,0 +1,81 @@
+# -*- shell-script -*-
+#
+# Firewall configuration for a front end and cache server
+#
+
+@def $FRONTEND_HOSTS = ( {% for host in groups['frontend-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
+@def $APPLAYER_HOSTS = ( {% for host in groups['applayer-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
+@def $BACKEND_HOSTS  = ( {% for host in groups['backend-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
+@def $CLUSTER_HOSTS  = ( {% for host in groups['cluster-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
+
+table filter {
+    chain INPUT {
+        policy DROP;
+
+        # --------------------- 
+        # Section for all hosts
+        # ---------------------
+
+        # connection tracking
+        mod state state INVALID DROP;
+        mod state state (ESTABLISHED RELATED) ACCEPT;
+
+        # allow local connections
+        interface lo ACCEPT;
+
+        # respond to ping
+        proto icmp icmp-type echo-request ACCEPT;
+
+        # SSH connection from anywhere
+        proto tcp dport ssh ACCEPT;
+
+{% if inventory_hostname in groups['cache'] %}
+        # -----------------------
+        # Section for cache hosts
+        # -----------------------
+
+        # allowing cache connection from any cluster host
+        #saddr $CLUSTER_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
+        saddr $FRONTEND_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
+        saddr $APPLAYER_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
+        saddr $BACKEND_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
+{% endif %}
+
+{% if inventory_hostname in groups['frontend-hosts'] %}
+        # --------------------------
+        # Section for frontend hosts
+        # --------------------------
+
+        # opening the web ports
+        proto tcp dport (http https) ACCEPT;
+{% endif %}
+
+{% if inventory_hostname in groups['applayer-hosts'] %}
+        # --------------------------
+        # Section for applayer hosts
+        # --------------------------
+
+        # opening the uwsgi port
+        saddr $FRONTEND_HOSTS proto tcp dport ( {{ appserver_port }} ) ACCEPT;
+{% endif %}
+
+{% if inventory_hostname in groups['backend-hosts'] %}
+        # -------------------------
+        # Section for backend hosts
+        # -------------------------
+
+        # opening the database (postgres) port
+        saddr $APPLAYER_HOSTS proto tcp dport ( 5432 ) ACCEPT;
+{% endif %}
+
+        # the rest is dropped by the above policy
+    }
+
+    # outgoing connections are not limited
+    chain OUTPUT policy ACCEPT;
+
+    # this is not a router
+    chain FORWARD policy DROP;
+}
+
+

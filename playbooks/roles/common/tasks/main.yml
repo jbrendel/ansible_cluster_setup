@@ -35,4 +35,14 @@
 - name: installing ferm firewall tool
   apt: pkg=ferm state=present
 
+- name: write ferm config file to set role specific rules
+  template: >
+        src=ferm.conf.j2
+        dest=/etc/ferm/ferm.conf
+        owner=root group=root group=root mode=644
+        backup=yes
+
+- name: restarting ferm with the new rules
+  service: name=ferm state=restarted
+
 
