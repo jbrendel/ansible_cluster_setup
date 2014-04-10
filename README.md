@@ -183,6 +183,7 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
+- Setup SSL certs and enable SSL on nginx with perfect forward secrecy.
 - Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
 - Setup database cluster with failover, if possible.

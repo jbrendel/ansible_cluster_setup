@@ -6,7 +6,7 @@
 
 
 - name: basic configs on all servers
-  hosts: cluster-hosts
+  hosts: all:!localhost
   sudo: yes
   roles:
     - common

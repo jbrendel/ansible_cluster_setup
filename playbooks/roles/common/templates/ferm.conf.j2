@@ -6,7 +6,14 @@
 @def $FRONTEND_HOSTS = ( {% for host in groups['frontend-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
 @def $APPLAYER_HOSTS = ( {% for host in groups['applayer-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
 @def $BACKEND_HOSTS  = ( {% for host in groups['backend-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
-@def $CLUSTER_HOSTS  = ( {% for host in groups['cluster-hosts'] %} {{ hostvars[host][eth_interface]['ipv4']['address'] }} {% endfor %} ) ;
+
+{#
+    Would love to just define a CLUSTER_HOSTS variable, iterating over group['cluster-hosts'].
+    However, such dynamic groups cannot be used in the same way as normal groups, so I'm forced
+    to refer to each group separately.
+#}
+
+@def $CACHE_PORTS = ( {{ cache.pip_cache_port }} {{ cache.apt_cache_port }} ) ;
 
 table filter {
     chain INPUT {
@@ -35,10 +42,9 @@ table filter {
         # -----------------------
 
         # allowing cache connection from any cluster host
-        #saddr $CLUSTER_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
-        saddr $FRONTEND_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
-        saddr $APPLAYER_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
-        saddr $BACKEND_HOSTS proto tcp dport ( 3141 3142 ) ACCEPT;
+        saddr $FRONTEND_HOSTS proto tcp dport $CACHE_PORTS ACCEPT;
+        saddr $APPLAYER_HOSTS proto tcp dport $CACHE_PORTS ACCEPT;
+        saddr $BACKEND_HOSTS proto tcp dport $CACHE_PORTS ACCEPT;
 {% endif %}
 
 {% if inventory_hostname in groups['frontend-hosts'] %}
