@@ -1,9 +1,28 @@
-[ap-southeast-2]
+#
+# Inventory file.
+#
+
+# Used for your local machine
+localhost ansible_connection=local
+
+#
+# Define your hosts. Please note that the host names can be
+# determined by you in any way you wish.
+#
 load_balancer ansible_ssh_host=54.206.128.223
 app_host_1    ansible_ssh_host=54.206.128.242
 app_host_2    ansible_ssh_host=54.206.173.252
 db_host       ansible_ssh_host=54.252.80.84
 
+
+#
+# Define groups for cluster formation: Specify, which hosts
+# make up which groups. A host can be part of multiple groups.
+# In theory, you could use just a single host and specify that
+# one host in all of your groups.
+#
+[cache]
+db_host
 
 [frontend-hosts]
 load_balancer
@@ -16,10 +35,17 @@ app_host_2
 db_host
 
 
+#
+# Group of hosts that need access to the database
+#
 [db-access:children]
 applayer-hosts
 backend-hosts
 
+#
+# All the hosts that are in the cluster (not local and
+# not apt cache).
+#
 [appserver-access:children]
 frontend-hosts
 applayer-hosts

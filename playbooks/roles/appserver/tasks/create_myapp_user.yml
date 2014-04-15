@@ -20,7 +20,7 @@
 - template: >
         src=pip.conf.j2
         dest=/home/{{ myapp_user_name }}/.pip/pip.conf
-        owner={{ myapp_user_name }} group={{ myapp_group_name }} group=root mode=644
+        owner={{ myapp_user_name }} group={{ myapp_group_name }} mode=644
   when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
 
 #

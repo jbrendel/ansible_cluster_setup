@@ -3,7 +3,7 @@ Introduction
 ============
 This is a complete Ansible playbook to setup a cluster of machines, so that we
 have one load balancer (frontend), one database server (backend) and some number
-of appservers (applayer) in the middle.  If specified, an APT and PIP cache
+of appservers (applayer) in the middle. If specified, an APT and PIP cache
 server is either used or created as well.
 
 A first version of this was demonstrated during the NZPUG talk in Auckland,
@@ -12,6 +12,26 @@ March 19, 2014. The slides for this talk are in the
 
 In this example, we use Ubuntu hosts, nginx as the load balancer, setup a Django
 app on each appserver and use postgres on the database server.
+
+
+Features
+--------
+- Deploys complete load-balancer/appserver/DB-server clusters with a single
+  command.
+- Supported deployment targets: Static servers provided by you, dynamically
+  created servers on Amazon EC2 or DigitalOcean, Vagrant virtual machines.
+- Support of cluster for deployment or just for running of tests (auto shut-
+  down of any created servers at the end of the run).
+- Deploys Django applications from your repository.
+- Runs unit tests before Django deployment is considered successful.
+- Django deployment via auto-re-starting uWSGI for performance and stability.
+- Postgres backend database.
+- Nginx load balancer with caching configured.
+- Utilizes (or creates on demand) APT and PIP caches to speed up cluster
+  deployment.
+- Configures IPtables to restrict access as much as possible, for example, only
+  allow cluster hosts to access database, only allow load balancer to access
+  uWSGI port of app server, etc.
 
 
 Getting Ansible
@@ -34,11 +54,19 @@ your own "extra_vars.yml" file (doesn't have to be that name). You can use the
 vars/example_extra_vars.yml file as a guide on what to specify there.
 
 
+Inventory
+---------
+Have a look at the 'hosts' file. This shows an example 'inventory' file for
+our Ansible run. The IP addresses won't work for you, so please replace them
+with your own. However, please take note of the groups that are defined here.
+Those groups need to be present in your own inventory file.
+
+
 Using dynamically created hosts
 -------------------------------
 We also have a second option, in which Ansible will create on its own a number
 of hosts on a specified cloud provider and fully provision and configure them in
-the cluster.  This is really useful to easily setup new test clusters, or to
+the cluster. This is really useful to easily setup new test clusters, or to
 show customers what you're working on, etc., or maybe even for the actual
 deployment cluster.
 
@@ -84,7 +112,7 @@ For DigitalOcean:
 Testruns in cloud environments
 ------------------------------
 If the only purpose of the cluster is to run tests, it is not necessary to keep
-the running instances around after a successful completion. In that case, fund
+the running instances around after a successful completion. In that case, find
 the EXT.PURPOSE parameter and set it to "testrun". In that case, the cluster
 is deployed and if all tests run successfully, the cluster nodes will be terminated
 right away.
@@ -151,7 +179,7 @@ variable "pkg_cache_existing_ip_addr".
 
 Vagrant
 -------
-There is also a Vgrantfile if you wish to start VMs locally for testing or
+There is also a Vagrantfile if you wish to start VMs locally for testing or
 development.  It uses the vagrant_hosts_multi inventory file. In fact, there are
 two Vagrantfiles: Vargantfile_Single and Vagrantfile_Multi. The 'Single' option
 deploys the entire cluster on a single VM, while the 'Multi' option creates
@@ -183,6 +211,7 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
+- Amazon: Support Amazon RDS
 - Setup SSL certs and enable SSL on nginx with perfect forward secrecy.
 - Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
@@ -191,8 +220,10 @@ Todo
   host: Hitting the finished cluster with Selenium or similar to test
   basic site connectivity.
 - Adding monitoring and alerts.
-- Amazon: Support Amazon RDS
 - Amazon: Support Amazon load balancer.
 - Amazon: Support adding servers to auto-scale groups.
+- Consider use of memcached.
+- Consider use of dedicated cache server, such as varnish.
+
 
 

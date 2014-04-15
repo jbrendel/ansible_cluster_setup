@@ -21,7 +21,7 @@
 - template: >
         src=pip.conf.j2
         dest=/root/.pip/pip.conf
-        owner=root group=root group=root mode=644
+        owner=root group=root mode=644
   when: cache.pkg_cache == "use"  or  cache.pkg_cache == "create"
 
 - name: updating the system
