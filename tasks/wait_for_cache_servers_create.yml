@@ -1,0 +1,9 @@
+#
+# Waiting for the various cache servers, which we have just created.
+#
+- name: wait for apt cache server port to be operational (new cache)
+  wait_for: host={{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }} port={{ cache.apt_cache_port }}
+- name: wait for PIP cache server port to be operational (new cache)
+  wait_for: host={{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }} port={{ cache.pip_cache_port }}
+
+

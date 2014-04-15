@@ -16,21 +16,21 @@
 # localhost. Therefore, we must make sure to exclude the cache machine
 # itself, since that one is probably not done rebooting at this point.
 #
-- hosts: cluster-hosts:!cache
+- name: waiting for caches to come online
+  hosts: cluster-hosts:!cache
   gather_facts: False
   tasks:
-    - name: wait for apt cache server port to be operational (new cache)
-      wait_for: host={{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }} port={{ cache.apt_cache_port }}
+    - include: tasks/wait_for_cache_servers_create.yml
       when: cache.pkg_cache == "create"
-    - name: wait for apt cache server port to be operational (existing cache)
-      wait_for: host={{ cache.pkg_cache_existing_ip_addr }} port={{ cache.apt_cache_port }}
+    - include: tasks/wait_for_cache_servers_use.yml
       when: cache.pkg_cache == "use"
-    - name: wait for PIP cache server port to be operational (new cache)
-      wait_for: host={{ hostvars[groups['cache'][0]][eth_interface]['ipv4']['address'] }} port={{ cache.pip_cache_port }}
-      when: cache.pkg_cache == "create"
-    - name: wait for PIP cache server port to be operational (existing cache)
-      wait_for: host={{ cache.pkg_cache_existing_ip_addr }} port={{ cache.pip_cache_port }}
-      when: cache.pkg_cache == "use"
+
+- name: create or configure the RDS database, if we are supposed to use it
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - include: tasks/rds_configure.yml
+      when: EXT.EC2.rds.use_or_create == "create"  or  EXT.EC2.rds.use_or_create == "use"
 
 #
 # Functional setup of cluster servers.

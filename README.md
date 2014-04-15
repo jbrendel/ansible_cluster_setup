@@ -211,7 +211,11 @@ Hopefully, this is useful to you anyway.
 
 Todo
 ----
-- Amazon: Support Amazon RDS
+- Amazon: Support Amazon RDS.
+    - Want to be able to use same instance for multiple DBs.
+    - Need to be able to configure new users and DBs for each projetc/run.
+    - How to access the server with psql? from localhost? From one of
+      the cluster hosts?
 - Setup SSL certs and enable SSL on nginx with perfect forward secrecy.
 - Make sure only running appservers are added to load balancing group.
 - Add support for Rackspace as alternative to EC2 and DigitalOcean.
@@ -222,6 +226,10 @@ Todo
 - Adding monitoring and alerts.
 - Amazon: Support Amazon load balancer.
 - Amazon: Support adding servers to auto-scale groups.
+    - How do we get Ansible to configure the new instances?
+        - ansible-pull?
+        - Messsage to central server who gets new inventory and
+          re-runs playbook?
 - Consider use of memcached.
 - Consider use of dedicated cache server, such as varnish.
 
