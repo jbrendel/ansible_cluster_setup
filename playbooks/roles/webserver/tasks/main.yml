@@ -6,6 +6,8 @@
 
 - name: install nginx
   apt: pkg=nginx state=present
+  notify:
+    - restart nginx
 
 #
 # We create the config file for nginx, which defines a load balancing group.
@@ -16,12 +18,20 @@
 # hosts into another dynamic group and then here in the template iterate over
 # that dynamically created group instead.
 #
+- name: add nginx cache path config
+  copy: src=nginx_uwsgi_cache_path.conf dest=/etc/nginx/conf.d/uwsgi_cache_path.conf
+
+- name: create nginx include directory
+  file: path=/etc/nginx/includes state=directory 
+  
+- name: copy nginx uwsgi config file
+  copy: src=nginx_includes/uwsgi.conf dest=/etc/nginx/includes/uwsgi.conf
+
+- name: copy nginx uwsgi_cache config file
+  copy: src=nginx_includes/uwsgi_cache.conf dest=/etc/nginx/includes/uwsgi_cache.conf
+
 - name: create nginx config file for the site
   template: src=nginx-default.j2 dest=/etc/nginx/sites-available/default
   notify:
     - restart nginx
-
-- name: add nginx config
-  copy: src=nginx_uwsgi.conf dest=/etc/nginx/conf.d/uwsgi.conf
-
 

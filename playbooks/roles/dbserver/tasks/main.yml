@@ -15,7 +15,7 @@
       - libpq-dev
 
 - name: ensure the server is started
-  service: name=postgresql state=started
+  service: name=postgresql state=started enabled=yes
 
 - name: configure postgres user
   sudo_user: postgres

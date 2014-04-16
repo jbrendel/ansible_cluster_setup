@@ -5,5 +5,5 @@
 ---
 
 - name: restart db server
-  service: name=postgresql state=restarted
+  service: name=postgresql state=restarted enabled=yes
 

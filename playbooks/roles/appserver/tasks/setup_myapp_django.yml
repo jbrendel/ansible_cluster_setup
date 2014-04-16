@@ -159,5 +159,5 @@
   template: src=init_uwsgi.conf.j2 dest=/etc/init/uwsgi.conf
 
 - name: starting uWSGI/Django server process
-  service: name=uwsgi state=started
+  service: name=uwsgi state=started enabled=yes
 

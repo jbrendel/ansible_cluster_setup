@@ -43,6 +43,6 @@
         backup=yes
 
 - name: restarting ferm with the new rules
-  service: name=ferm state=restarted
+  service: name=ferm state=restarted enabled=yes
 
 
